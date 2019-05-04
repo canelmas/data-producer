@@ -3,12 +3,13 @@ import faker from 'faker';
 import _ from 'lodash';
 import moment from 'moment'
 
-let generate = () => {
+let generate = (appId) => {
 
   let ldid = uuid()
 
   return {    
     email : faker.internet.email(),
+    appId: appId || null,
     phone: faker.phone.phoneNumber(),
     aid: uuid(),
     cid: uuid(),

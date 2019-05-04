@@ -161,7 +161,7 @@ let generateAndPersistUsersOntoRedis = () => {
     if (isProd()) {
       redisClient.set(userInfo["aid"], JSON.stringify(userInfo), redisClient.print)
     } else {
-      info(JSON.stringify(userInfo))
+      prettyPrint(userInfo)      
     }
   }
 
@@ -222,7 +222,7 @@ let generateAndSendEventsAndUsers = () => {
       let appId = getRandomAppId()
 
       // new user
-      let userInfo = UserGenerator.generate()
+      let userInfo = UserGenerator.generate(appId)
 
       // new device based on user's last device id
       let deviceInfo = DeviceGenerator.generate(userInfo["ldid"])
