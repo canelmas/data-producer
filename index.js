@@ -4,38 +4,39 @@ import {
   getSessionStopTime,
   getSessionDuration
 } from "./util";
-import {
-  KafkaClient,
-  Producer
-} from 'kafka-node';
-import KafkaConfig from './config/kafka';
+
+import configKafka from './config/kafka';
 import redisClient from "./config/redis";
-import modes from "./modes";
+import {
+  modes,
+  modeFromString
+} from "./modes";
 
 import UserGenerator from "./generators/user_generator";
 import DeviceGenerator from "./generators/device_generator";
 import SessionGenerator from "./generators/session_generator";
 import EventGenerator from "./generators/event_generator";
 
-const kafkaClient = new KafkaClient({
-  kafkaHost: KafkaConfig.brokerHost,
-  requestTimeout: KafkaConfig.timeout
-});
-const kafkaProducer = new Producer(kafkaClient, KafkaConfig.producerOptions)
+import {
+  Kafka
+} from 'kafkajs'
+
+const NODE_ENV = process.env.NODE_ENV || "development"
+const VERBOSE = process.env.VERBOSE || "true"
 
 const PERIOD = process.env.PERIOD_IN_MS || 5 * 1000;
 const NUM_OF_USERS = process.env.NUM_OF_USERS || 1
 const SESSION_PER_USER = process.env.SESSION_PER_USER || 1
 const EVENTS_PER_SESSION = process.env.EVENTS_PER_SESSION || 5
-const RUN_MODE = process.env.RUN_MODE || modes.GENERATE_AND_SEND_EVENTS_AND_USERS
+const RUN_MODE = modeFromString(process.env.RUN_MODE) || modes.GENERATE_AND_SEND_EVENTS_AND_USERS
+const APPS = (process.env.APP_IDS || "DemoApp").replace(" ", "").split(",")
+const TOPICS_TO_CREATE = process.env.CREATE_TOPICS || undefined
 
-const NODE_ENV = process.env.NODE_ENV || "development"
-const VERBOSE = process.env.VERBOSE || false
+const kafka = new Kafka(configKafka.brokerOptions)
+const kafkaProducer = kafka.producer()
 
-const apps = (process.env.APP_IDS || "DemoApp").replace(" ", "").split(",")  
-
-let getRandomAppId = () => {  
-  return _.sample(apps)
+let getRandomAppId = () => {
+  return _.sample(APPS)
 }
 
 let isVerbose = () => {
@@ -69,11 +70,14 @@ let showConfig = () => {
   info(`numOfUsers=${NUM_OF_USERS}`)
   info(`sessionPerUser=${SESSION_PER_USER}`)
   info(`eventPerSession=${EVENTS_PER_SESSION}`)
-  info(`verbose=${VERBOSE}`)  
+  info(`verbose=${VERBOSE}`)
+  info(`topicsToCreate=${TOPICS_TO_CREATE}`)
+  info(`brokers=${configKafka.brokerOptions.brokers}\n`)
 }
 
-redisClient.on('ready', () => {
+redisClient.on('ready', async () => {
   info("Redis [OK]")
+  await kafkaProducer.connect()
 })
 
 redisClient.on('error', (err) => {
@@ -81,14 +85,11 @@ redisClient.on('error', (err) => {
   exit()
 })
 
-kafkaProducer.on("error", (err) => {
-  error(`Kafka [NOK] ${err}`)
-  exit()
-})
-
-kafkaProducer.on('ready', function () {
+kafkaProducer.on(kafkaProducer.events.CONNECT, async (e) => {
   info("Kafka [OK]")
   showConfig()
+
+  await createTopics()
 
   if (RUN_MODE == modes.SEND_USERS_ON_REDIS) {
     sendUsersOnRedis()
@@ -100,6 +101,11 @@ kafkaProducer.on('ready', function () {
     generateAndSendEventsAndUsers()
   }
 
+})
+
+kafkaProducer.on(kafkaProducer.events.DISCONNECT, e => {
+  error(`Kafka [NOK] ${err}`)
+  exit()
 })
 
 let scanRedis = (cursor, callback, finalize) => {
@@ -161,7 +167,7 @@ let generateAndPersistUsersOntoRedis = () => {
     if (isProd()) {
       redisClient.set(userInfo["aid"], JSON.stringify(userInfo), redisClient.print)
     } else {
-      prettyPrint(userInfo)      
+      prettyPrint(userInfo)
     }
   }
 
@@ -286,57 +292,76 @@ let createAndSendSessionEvents = (appId, userInfo, deviceInfo) => {
     userInfo["aid"],
     userInfo["cid"],
     appId))
+
 }
 
-let sendUser = (userInfo) => {
+let createTopics = async () => {
 
-  if (isProd()) {
+  if (TOPICS_TO_CREATE) {
 
-    let user_payload = [{
-      topic: KafkaConfig.topics.users,
-      messages: [JSON.stringify(userInfo)],
-      attributes: KafkaConfig.compressionType
-    }]
-    
-    kafkaProducer.send(user_payload, (err, result) => {
-      if (err) {
-        error(`Error producing! ${err}`)
-      } else {
-        if (isVerbose()) {
-          info(result)
-        }
+    let topics = []
 
-      }
+    _.forEach(_.split(TOPICS_TO_CREATE.replace(/\s/g, ""), ","), topicEntry => {
+
+      let topicParams = _.split(topicEntry, ":")
+
+      topics.push({
+        topic: topicParams[0],
+        numPartitions: topicParams[1],
+        replicationFactor: topicParams[2]
+      })
+
     })
 
-  } else {
-    prettyPrint(userInfo)
+    const admin = kafka.admin()
+
+    await admin.connect()
+
+    await admin.createTopics({
+      validateOnly: false,
+      waitForLeaders: true,
+      timeout: 20000,
+      topics: topics
+    }).then(success => {
+      info("Topic Creation " + (success ? "[OK]" : "[NOK]\n"))
+    })
+
+    await admin.disconnect()
+
   }
 
 }
 
-let sendEvent = (event) => {
+let sendUser = async (userInfo) => {
+  send(configKafka.topicOptions.users, userInfo)
+}
+
+let sendEvent = async (event) => {
+  send(configKafka.topicOptions.events, event)
+}
+
+let send = async (topic, message) => {
 
   if (isProd()) {
 
-    let event_payload = [{
-      topic: KafkaConfig.topics.events,
-      messages: [JSON.stringify(event)],
-      attributes: KafkaConfig.compressionType
-    }]
-    
-    kafkaProducer.send(event_payload, (err, result) => {
-      if (err) {
-        error(`Error producing! ${err}`)
-      } else {
+    await kafkaProducer.send({
+        topic: topic,
+        messages: [{
+          value: JSON.stringify(message)
+        }],
+        acks: configKafka.producerOptions.acks,
+        timeout: configKafka.producerOptions.timeout,
+        compression: configKafka.producerOptions.compression
+      })
+      .then(res => {
         if (isVerbose()) {
-          info(result)
+          info(res)
         }
-      }
-    })
+      })
+      .catch(error)
 
   } else {
-    prettyPrint(event)
+    prettyPrint(message)
   }
 
 }
