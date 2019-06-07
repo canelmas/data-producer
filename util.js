@@ -26,5 +26,6 @@ export {
   newEventTime,
   nextEventTime,
   getSessionStopTime,
-  getSessionDuration
+  getSessionDuration,
+  DATE_FORMAT
 }

@@ -7,20 +7,21 @@ stop() {
 start() {
     docker run --name=data-producer -d --restart=always \
         --network $2 \
-        -e PERIOD_IN_MS=5000 \
+        -e PERIOD_IN_MS=3000 \
         -e NUM_OF_USERS=5 \
         -e SESSION_PER_USER=2 \
-        -e EVENTS_PER_SESSION=30 \
+        -e EVENTS_PER_SESSION=20 \
         -e TOPICS_USERS=users \
         -e TOPICS_EVENTS=events \
         -e CREATE_TOPICS="events:1:1,users:1:1" \
-        -e RUN_MODE=create-users \
-        -e EVENT_SCENARIO=random \
+        -e RUN_MODE=default \
+        -e EVENT_SCENARIO=apm \
         -e NODE_OPTIONS=--max_old_space_size=4096 \
         -e REDIS_HOST=redis \
         -e REDIS_PORT=6379 \
         -e BROKERS=broker:19092 \
-        -e VERBOSE="true" \        
+        -e VERBOSE="true" \
+        -e DATE_FORMAT="YYYY-MM-DDTHH:mm:ssZ" \
         -e APP_IDS="LovelyApp,LoveliestApp,HappyApp,HappiestApp" \
         -e NODE_ENV=production canelmas/data-producer:$1
 }

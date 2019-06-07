@@ -2,7 +2,8 @@ import _ from 'lodash';
 
 import {
   getSessionStopTime,
-  getSessionDuration
+  getSessionDuration,
+  DATE_FORMAT
 } from "./util";
 
 import configKafka from './config/kafka';
@@ -70,6 +71,7 @@ let showConfig = () => {
   info(`numOfUsers=${NUM_OF_USERS}`)
   info(`sessionPerUser=${SESSION_PER_USER}`)
   info(`eventPerSession=${EVENTS_PER_SESSION}`)
+  info(`dateFormat=${DATE_FORMAT}\n`)
   info(`verbose=${VERBOSE}`)
   info(`topicsToCreate=${TOPICS_TO_CREATE}`)
   info(`brokers=${configKafka.brokerOptions.brokers}\n`)
