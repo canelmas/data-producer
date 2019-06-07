@@ -27,10 +27,10 @@ const SCENARIO_CUSTOM = "custom"
 const SCENARIO_APM =  "apm"
 
 const scenarios = [
-  // SCENARIO_RANDOM,
-  // SCENARIO_VIEW,
-  // SCENARIO_COMMERCE,
-  // SCENARIO_CUSTOM,
+  SCENARIO_RANDOM,
+  SCENARIO_VIEW,
+  SCENARIO_COMMERCE,
+  SCENARIO_CUSTOM,
   SCENARIO_APM
 ]
 
@@ -252,7 +252,7 @@ let generateRandomEvent = (eventCreationTime,
                                  appconnectId,
                                  customerId,
                                  appId)
-                                 
+
   }
 
 }
