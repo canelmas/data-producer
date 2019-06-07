@@ -3,17 +3,20 @@ import uuid from 'uuid/v4';
 import CommerceEvents from "./commerce_events"
 import CustomEvents from "./custom_events"
 import ViewEvents from "./screen_events"
+import APMEvents from './apm_events'
 import {nextEventTime} from "../util.js"
 
 // Event Categories
 const EVENT_CATEGORY_VIEWS = "view"
 const EVENT_CATEGORY_COMMERCE = "commerce"
 const EVENT_CATEGORY_CUSTOM = "custom"
+const EVENT_CATEGORY_APM = "apm"
 
 const eventCategories = [
   EVENT_CATEGORY_VIEWS,
   EVENT_CATEGORY_COMMERCE,
-  EVENT_CATEGORY_CUSTOM
+  EVENT_CATEGORY_CUSTOM,
+  EVENT_CATEGORY_APM
 ]
 
 // Event Scenarios
@@ -21,12 +24,14 @@ const SCENARIO_RANDOM = "random"
 const SCENARIO_VIEW = "view"  
 const SCENARIO_COMMERCE = "commerce"
 const SCENARIO_CUSTOM = "custom" 
+const SCENARIO_APM =  "apm"
 
 const scenarios = [
-  SCENARIO_RANDOM,
-  SCENARIO_VIEW,
-  SCENARIO_COMMERCE,
-  SCENARIO_CUSTOM
+  // SCENARIO_RANDOM,
+  // SCENARIO_VIEW,
+  // SCENARIO_COMMERCE,
+  // SCENARIO_CUSTOM,
+  SCENARIO_APM
 ]
 
 export let generate = (eventName,
@@ -106,6 +111,13 @@ let generateSessionEvent = (scenario,
                                appconnectId,
                                customerId,
                                appId)
+    case SCENARIO_APM:
+        return generateAPMEvent(eventCreationTime,
+                                deviceInfo,
+                                clientSession,
+                                appconnectId,
+                                customerId,
+                                appId)
     case SCENARIO_RANDOM:
     default:
       return generateRandomEvent(eventCreationTime,
@@ -116,6 +128,25 @@ let generateSessionEvent = (scenario,
                                  appId)
   }
 
+}
+
+let generateAPMEvent = (eventCreationTime,
+                              deviceInfo,
+                              clientSession,
+                              appconnectId,
+                              customerId,
+                              appId) => {
+
+  let event = APMEvents.takeOne()
+  
+  return generateEvent(event["name"],
+    event["attrs"],
+    eventCreationTime,
+    deviceInfo,
+    clientSession,
+    appconnectId,
+    customerId,
+    appId)
 }
 
 let generateCommerceEvent = (eventCreationTime,
@@ -184,6 +215,7 @@ let generateRandomEvent = (eventCreationTime,
   let category = _.sample(eventCategories)
 
   switch (category) {
+
     case EVENT_CATEGORY_COMMERCE:
       return generateCommerceEvent(eventCreationTime,
                                    deviceInfo,
@@ -198,6 +230,20 @@ let generateRandomEvent = (eventCreationTime,
                                appconnectId,
                                customerId,
                                appId)
+    case EVENT_CATEGORY_VIEWS:
+      return generateViewEvent(eventCreationTime,
+                               deviceInfo,
+                               clientSession,
+                               appconnectId,
+                               customerId,
+                               appId)
+    case EVENT_CATEGORY_APM:
+      return generateAPMEvent(eventCreationTime,
+                              deviceInfo,
+                              clientSession,
+                              appconnectId,
+                              customerId,
+                              appId)
     case EVENT_CATEGORY_CUSTOM:
     default:
       return generateCustomEvent(eventCreationTime,
@@ -206,6 +252,7 @@ let generateRandomEvent = (eventCreationTime,
                                  appconnectId,
                                  customerId,
                                  appId)
+                                 
   }
 
 }
