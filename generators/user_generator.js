@@ -2,6 +2,7 @@ import uuid from 'uuid/v4';
 import faker from 'faker';
 import _ from 'lodash';
 import moment from 'moment'
+import {newEventTime} from '../util'
 
 let generate = (appId) => {
 
@@ -9,6 +10,7 @@ let generate = (appId) => {
 
   return {    
     email : faker.internet.email(),
+    clientCreationDate: newEventTime(),
     appId: appId || null,
     phone: faker.phone.phoneNumber(),
     aid: uuid(),
