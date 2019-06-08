@@ -1,6 +1,4 @@
 import _ from 'lodash';
-import faker from 'faker'
-
 
 let ANDROID_BRANDS = [
   "HTC",
@@ -28,7 +26,6 @@ let ANDROID_MODELS = [
   "Xiaomi Redmi Note",
   "Samsung Galaxy S9"
 ]
-
 
 let generate = (deviceId) => {
 
