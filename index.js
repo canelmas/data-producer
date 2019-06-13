@@ -32,6 +32,7 @@ const EVENTS_PER_SESSION = process.env.EVENTS_PER_SESSION || 5
 const RUN_MODE = modeFromString(process.env.RUN_MODE) || modes.GENERATE_AND_SEND_EVENTS_AND_USERS
 const APPS = (process.env.APP_IDS || "DemoApp").replace(" ", "").split(",")
 const TOPICS_TO_CREATE = process.env.CREATE_TOPICS || undefined
+const EVENT_SCENARIO = process.env.EVENT_SCENARIO || "apm"
 
 const kafka = new Kafka(configKafka.brokerOptions)
 const kafkaProducer = kafka.producer()
@@ -67,11 +68,12 @@ let prettyPrint = (json) => {
 let showConfig = () => {
   info(`mode=${NODE_ENV}`)
   info(`runMode=${RUN_MODE}`)
+  info(`scenario=${EVENT_SCENARIO}`)
   info(`period=${PERIOD}`)
   info(`numOfUsers=${NUM_OF_USERS}`)
   info(`sessionPerUser=${SESSION_PER_USER}`)
   info(`eventPerSession=${EVENTS_PER_SESSION}`)
-  info(`dateFormat=${DATE_FORMAT}\n`)
+  info(`dateFormat=${DATE_FORMAT}`)
   info(`verbose=${VERBOSE}`)
   info(`topicsToCreate=${TOPICS_TO_CREATE}`)
   info(`brokers=${configKafka.brokerOptions.brokers}\n`)
@@ -90,7 +92,7 @@ redisClient.on('error', (err) => {
 kafkaProducer.on(kafkaProducer.events.CONNECT, async (e) => {
   info("Kafka [OK]")
   showConfig()
-
+  
   await createTopics()
 
   if (RUN_MODE == modes.SEND_USERS_ON_REDIS) {
@@ -269,7 +271,8 @@ let createAndSendSessionEvents = (appId, userInfo, deviceInfo) => {
       appId))
 
   // fire session events
-  let sessionEvents = EventGenerator.generateSessionEvents(EVENTS_PER_SESSION,
+  let sessionEvents = EventGenerator.generateSessionEvents(EVENT_SCENARIO,
+    EVENTS_PER_SESSION,
     sessionStartTime,
     deviceInfo,
     sessionInfo["clientSession"],

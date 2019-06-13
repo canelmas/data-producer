@@ -57,15 +57,14 @@ export let generate = (eventName,
 
 }
 
-export let generateSessionEvents = (numOfEvents,
-                                        sessionStartTime,
-                                        deviceInfo,
-                                        clientSession,
-                                        appconnectId,
-                                        customerId,
-                                        appId) => {
-
-  let scenario = process.env.EVENT_SCENARIO || _.sample(scenarios)
+export let generateSessionEvents = (scenario, 
+                                    numOfEvents,
+                                    sessionStartTime,
+                                    deviceInfo,
+                                    clientSession,
+                                    appconnectId,
+                                    customerId,
+                                    appId) => {
 
   let eventCreationTime = sessionStartTime
 
@@ -83,12 +82,12 @@ export let generateSessionEvents = (numOfEvents,
 }
 
 let generateSessionEvent = (scenario,
-                              eventCreationTime,
-                              deviceInfo,
-                              clientSession,
-                              appconnectId,
-                              customerId,
-                              appId) => {
+                            eventCreationTime,
+                            deviceInfo,
+                            clientSession,
+                            appconnectId,
+                            customerId,
+                            appId) => {
   switch(scenario) {
     case SCENARIO_COMMERCE:
       return generateCommerceEvent(eventCreationTime,
@@ -131,11 +130,11 @@ let generateSessionEvent = (scenario,
 }
 
 let generateAPMEvent = (eventCreationTime,
-                              deviceInfo,
-                              clientSession,
-                              appconnectId,
-                              customerId,
-                              appId) => {
+                        deviceInfo,
+                        clientSession,
+                        appconnectId,
+                        customerId,
+                        appId) => {
 
   let event = APMEvents.takeOne()
   
@@ -150,11 +149,11 @@ let generateAPMEvent = (eventCreationTime,
 }
 
 let generateCommerceEvent = (eventCreationTime,
-                               deviceInfo,
-                               clientSession,
-                               appconnectId,
-                               customerId,
-                               appId) => {
+                             deviceInfo,
+                             clientSession,
+                             appconnectId,
+                             customerId,
+                             appId) => {
 
   let event = CommerceEvents.takeOne()
   return generateEvent(event["name"],
