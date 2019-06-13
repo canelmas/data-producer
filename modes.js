@@ -19,3 +19,7 @@ export let modeFromString = (selection) => {
   }
   return mode
 }
+
+export let isRedisRequired = (mode) => {
+  return [modes.SEND_USERS_ON_REDIS, modes.GENERATE_AND_WRITE_USERS_TO_REDIS, modes.GENERATE_AND_SEND_EVENTS_WITH_USERS_READ_FROM_REDIS].includes(mode)
+}

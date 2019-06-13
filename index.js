@@ -7,10 +7,12 @@ import {
 } from "./util";
 
 import configKafka from './config/kafka';
-import redisClient from "./config/redis";
+import configRedis from './config/redis'
+
 import {
   modes,
-  modeFromString
+  modeFromString,
+  isRedisRequired
 } from "./modes";
 
 import UserGenerator from "./generators/user_generator";
@@ -21,6 +23,8 @@ import EventGenerator from "./generators/event_generator";
 import {
   Kafka
 } from 'kafkajs'
+
+import redis from 'redis'
 
 const NODE_ENV = process.env.NODE_ENV || "development"
 const VERBOSE = process.env.VERBOSE || "true"
@@ -35,7 +39,9 @@ const TOPICS_TO_CREATE = process.env.CREATE_TOPICS || undefined
 const EVENT_SCENARIO = process.env.EVENT_SCENARIO || "apm"
 
 const kafka = new Kafka(configKafka.brokerOptions)
-const kafkaProducer = kafka.producer()
+
+let kafkaProducer = null
+let redisClient = null
 
 let getRandomAppId = () => {
   return _.sample(APPS)
@@ -79,17 +85,53 @@ let showConfig = () => {
   info(`brokers=${configKafka.brokerOptions.brokers}\n`)
 }
 
-redisClient.on('ready', async () => {
-  info("Redis [OK]")
-  await kafkaProducer.connect()
-})
+let initRedis = () => {
+  redisClient = redis.createClient(configRedis)
 
-redisClient.on('error', (err) => {
+  redisClient.on('ready', async () => {  
+    onRedisReady()
+  })
+  
+  redisClient.on('error', (err) => {
+    onRedisError(err)    
+  })
+}
+
+let initKafkaProducer = async () => {  
+
+  kafkaProducer = kafka.producer()  
+
+  kafkaProducer.on(kafkaProducer.events.CONNECT, async () => {    
+    await onKafkaReady()
+  })
+
+  kafkaProducer.on(kafkaProducer.events.DISCONNECT, async (err) => {    
+    await onKafkaError(err)  
+  })
+
+  await kafkaProducer.connect()
+
+}
+
+let init = () => {  
+  if (isRedisRequired(RUN_MODE)) {    
+    initRedis()
+  } else {    
+    initKafkaProducer()
+  }
+}
+
+let onRedisReady = () => {
+  info("Redis [OK]")
+  initKafkaProducer()
+}
+
+let onRedisError = (err) => {
   error(`Redis [NOK] ${err}`)
   exit()
-})
+}
 
-kafkaProducer.on(kafkaProducer.events.CONNECT, async (e) => {
+let onKafkaReady = async () => {
   info("Kafka [OK]")
   showConfig()
   
@@ -104,13 +146,12 @@ kafkaProducer.on(kafkaProducer.events.CONNECT, async (e) => {
   } else {
     generateAndSendEventsAndUsers()
   }
+}
 
-})
-
-kafkaProducer.on(kafkaProducer.events.DISCONNECT, e => {
+let onKafkaError = async (err) => {
   error(`Kafka [NOK] ${err}`)
   exit()
-})
+}
 
 let scanRedis = (cursor, callback, finalize) => {
 
@@ -370,3 +411,5 @@ let send = async (topic, message) => {
   }
 
 }
+
+init()
