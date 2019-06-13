@@ -80,22 +80,15 @@ const statusCodes = [
     503
 ]
 
-const headers = [{
-        "Content-Encoding": "gzip"
-    },
-    {
-        "Content-Length": _.random(5, 5000)
-    },
-    {
-        "Content-Type": "text/html"
-    },
-    {
-        "Server": "Apache"
-    },    
-    {
-        "Content-Type" : "application/x-www-form-urlencoded"
-    }
-]
+const headers = {
+        "Content-Encoding": "gzip",
+        "Content-Length": String(_.random(5, 5000)),
+        "Accept": _.sample(["text/html", "multipart/form-data"]),
+        "Content-Language" : _.sample(["de-DE", "en-US", "en-CA"]),
+        "Server": "Apache",
+        "Content-Type" : "application/x-www-form-urlencoded",
+        "Accept-Charset" : _.sample(["utf-8", "iso-8859-15"])
+}
 
 let randomHeaders = () => {
     return headers
@@ -165,6 +158,10 @@ let randomPath = () => {
     return path
 }
 
+let getRandomAttributes = (num) => {    
+    return _.zipObject(_.times(num, () => faker.internet.domainWord()), _.times(num, () => faker.internet.domainWord()))    
+  }
+
 let newHttpCall = () => {
 
     let view = faker.lorem.word()
@@ -184,14 +181,15 @@ let newHttpCall = () => {
         em: !isSuccess ? randomErrorMessage(errorCode) : null,
         s: isSuccess,
         d: randomDuration(),
-        sc: randomStatusCode(),
-        viewId: Buffer.from(viewLabel, "ascii").toString("base64"),
-        viewLabel: viewLabel,
+        sc: randomStatusCode(),        
         rqs: randomContentSize(),
         rps: randomContentSize(),
         m: randomHttpMethod(),
         sch: randomSchema(),
-        ph: randomPath()
+        ph: randomPath(),
+        viewId: Buffer.from(viewLabel, "ascii").toString("base64"),
+        viewLabel: viewLabel,
+        extras : Boolean(_.sample([true, false])) ? getRandomAttributes(_.random(1,10)) : null        
     }
 
 }
@@ -215,7 +213,8 @@ let newNetworkError = () => {
         em: randomErrorMessage(),
         ct: randomConnectionType(),
         viewId: Buffer.from(viewLabel, "ascii").toString("base64"),
-        viewLabel: viewLabel
+        viewLabel: viewLabel,
+        extras : Boolean(_.sample([true, false])) ? getRandomAttributes(_.random(1,10)) : null                
     }
 
 }
