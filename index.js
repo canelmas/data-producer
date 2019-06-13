@@ -99,7 +99,7 @@ let initRedis = () => {
 
 let initKafkaProducer = async () => {  
 
-  kafkaProducer = kafka.producer()  
+  kafkaProducer = kafka.producer(configKafka.producerOptions)  
 
   kafkaProducer.on(kafkaProducer.events.CONNECT, async () => {    
     await onKafkaReady()
@@ -395,9 +395,9 @@ let send = async (topic, message) => {
         messages: [{
           value: JSON.stringify(message)
         }],
-        acks: configKafka.producerOptions.acks,
-        timeout: configKafka.producerOptions.timeout,
-        compression: configKafka.producerOptions.compression
+        acks: configKafka.producerProperties.acks,
+        timeout: configKafka.producerProperties.timeout,
+        compression: configKafka.producerProperties.compression
       })
       .then(res => {
         if (isVerbose()) {

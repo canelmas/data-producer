@@ -34,9 +34,12 @@ export default {
       retries: 10
     }
   },
-  producerOptions: {
+  producerOptions : {
+    allowAutoTopicCreation: false
+  },
+  producerProperties : {
     acks: 1,
     timeout: 30000,
-    compression: CompressionTypes.None
+    compression: CompressionTypes.None    
   }
 }
