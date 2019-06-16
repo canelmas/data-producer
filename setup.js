@@ -4,7 +4,6 @@ import {
     modeFromString,
 } from "./modes"
 
-import configKafka from './config/kafka';
 import {
     info
 } from './logger'
@@ -21,6 +20,20 @@ let isProd = () => {
     return config.env == "production"
 }
 
+let parseBrokers = (brokerString) => {
+
+    if (!brokerString) {
+        return undefined
+    }
+
+    let brokers = []
+    _.forEach(_.split(brokerString.replace(/\s/g, ""), ","), broker => {
+        brokers.push(broker)
+    })
+
+    return brokers
+}
+
 let print = () => {
     info(`env=${config.env}`)
     info(`mode=${config.mode}`)
@@ -34,7 +47,9 @@ let print = () => {
     info(`topicsToCreate=${config.topicsToCreate}`)
     info(`format=${config.format}`)
     info(`userDemographics=${config.userDemographics}`)
-    info(`brokers=${configKafka.brokerOptions.brokers}`)
+    info(`brokers=${config.brokers}`)
+    info(`topicEvents=${config.topicEvents}`)
+    info(`topicUsers=${config.topicUsers}`)
     info(`schemaRegistry=${config.schemaRegistry}\n`)
 }
 
@@ -52,7 +67,10 @@ const config = {
     format: process.env.FORMAT || 'json',
     dateFormat: process.env.DATE_FORMAT || "YYYY-MM-DDTHH:mm:ssZ",
     schemaRegistry: process.env.SCHEMA_REGISTRY || undefined,
-    userDemographics : process.env.USER_DEMOGRAHPHICS || "false"
+    userDemographics: process.env.USER_DEMOGRAHPHICS || "false",
+    topicUsers: process.env.TOPIC_USERS || "users",
+    topicEvents: process.env.TOPIC_EVENTS || "events",
+    brokers: parseBrokers(process.env.BROKERS) || ["localhost:19092"]
 }
 
 export default {

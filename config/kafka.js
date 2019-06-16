@@ -1,32 +1,19 @@
 import _ from 'lodash'
+import setup from '../setup'
 
 const {
   logLevel,
   CompressionTypes
 } = require('kafkajs')
 
-let parseBrokers = (brokerConfig) => {
-  
-  if (!brokerConfig) {
-    return null
-  }
-
-  let brokers = []
-  _.forEach(_.split(brokerConfig.replace(/\s/g, ""), ","), broker => {
-    brokers.push(broker)
-  })
-  
-  return brokers
-}
-
 export default {
   topicOptions: {
-    users: process.env.TOPIC_USERS || 'users',
-    events: process.env.TOPIC_EVENTS || 'events'
+    users: setup.config.topicUsers,
+    events: setup.config.topicEvents
   },
   brokerOptions: {
     clientId: 'data-producer',
-    brokers: parseBrokers(process.env.BROKERS) || ["localhost:19092"],
+    brokers: setup.config.brokers,
     connectionTimeout: 10000,
     requestTimeout: 30000,
     logLevel: logLevel.ERROR,
