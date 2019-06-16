@@ -3,6 +3,7 @@ import faker from 'faker';
 import _ from 'lodash';
 import moment from 'moment'
 import {newEventTime} from '../util'
+import setup from '../setup'
 
 let generate = (appId) => {
 
@@ -26,10 +27,10 @@ let generate = (appId) => {
       ldid,
       uuid()
     ],
-    createdAt: moment(faker.date.past()).format('x'),
-    lastSeenAt: moment(faker.date.recent()).format('x'),
-    lastModifiedAt: moment(faker.date.recent()).format('x'),
-    data : process.env.GENERATE_USER_DEMOGRAPHICS ? generateDemographics() : null
+    createdAt: moment(faker.date.past()).format(setup.config.dateFormat),
+    lastSeenAt: moment(faker.date.recent()).format(setup.config.dateFormat),
+    lastModifiedAt: moment(faker.date.recent()).format(setup.config.dateFormat),
+    data : setup.config.userDemographics == "true" ? generateDemographics() : null    
   }  
 
 }

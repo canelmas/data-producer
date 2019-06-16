@@ -33,6 +33,7 @@ let print = () => {
     info(`dateFormat=${config.dateFormat}`)
     info(`topicsToCreate=${config.topicsToCreate}`)
     info(`format=${config.format}`)
+    info(`userDemographics=${config.userDemographics}`)
     info(`brokers=${configKafka.brokerOptions.brokers}`)
     info(`schemaRegistry=${config.schemaRegistry}\n`)
 }
@@ -50,7 +51,8 @@ const config = {
     scenario: process.env.EVENT_SCENARIO || "apm",
     format: process.env.FORMAT || 'json',
     dateFormat: process.env.DATE_FORMAT || "YYYY-MM-DDTHH:mm:ssZ",
-    schemaRegistry: process.env.SCHEMA_REGISTRY || undefined
+    schemaRegistry: process.env.SCHEMA_REGISTRY || undefined,
+    userDemographics : process.env.USER_DEMOGRAHPHICS || "false"
 }
 
 export default {
