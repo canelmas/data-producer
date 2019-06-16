@@ -1,7 +1,7 @@
 {
   "name": "data-producer",
   "version": "1.0.0",
-  "description": "Fake data producer",
+  "description": "Fake data producer for Kafka",
   "author": "Can Elmas <canelm@gmail.com>",
   "main": "index.js",
   "scripts": {
@@ -13,6 +13,7 @@
   "dependencies": {
     "faker": "^4.1.0",
     "kafkajs": "^1.8.0",
+    "kafkajs-avro": "^1.0.4",
     "lodash": "^4.17.11",
     "moment": "^2.22.2",
     "mustache": "^3.0.0",

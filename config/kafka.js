@@ -21,8 +21,8 @@ let parseBrokers = (brokerConfig) => {
 
 export default {
   topicOptions: {
-    users: process.env.TOPICS_USERS || 'users',
-    events: process.env.TOPICS_EVENTS || 'events'
+    users: process.env.TOPIC_USERS || 'users',
+    events: process.env.TOPIC_EVENTS || 'events'
   },
   brokerOptions: {
     clientId: 'data-producer',
