@@ -19,14 +19,17 @@ export default {
     logLevel: logLevel.ERROR,
     retry: {
       retries: 10
+    },
+    avro: {
+      url: setup.config.schemaRegistry
     }
   },
-  producerOptions : {
+  producerOptions: {
     allowAutoTopicCreation: false
   },
-  producerProperties : {
+  producerProperties: {
     acks: 1,
     timeout: 30000,
-    compression: CompressionTypes.None    
+    compression: CompressionTypes.None
   }
 }

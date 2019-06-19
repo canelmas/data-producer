@@ -1,137 +1,192 @@
 import _ from 'lodash'
-import {
-    Kafka
-} from 'kafkajs'
 
-import KafkaAvro from "kafkajs-avro"
+import {
+    Kafka,
+    KafkaAvro
+} from "kafkajs-avro"
 
 import config from './config/kafka'
 import setup from './setup'
 
 import {
     info,
-    prettyPrint
+    prettyPrint,
+    error
 } from './logger'
 
-let newInstance = () => {
-    return new Kafka(config.brokerOptions)
+const ENTITY_EVENT = 'event'
+const ENTITY_USER = 'user'
+
+let producers = {}
+let multiTopicMapping = []
+
+let checkSchemaRegistry = () => {
+    if (!setup.config.schemaRegistry) {
+        throw new Error("Schema Registry is missing!")
+    }
+}
+
+let isAvroRequired = () => {
+    return true
 }
 
 let initProducer = async (onReady, onError) => {
 
-    let kafkaProducer = null
+    let kafka = null
 
-    if (setup.config.format == 'avro') {
+    if (setup.config.multiTopics) {
 
-        if (!setup.config.schemaRegistry) {
-            throw new Error('No Schema Registry set!')
+        multiTopicMapping = createMultiTopicMapping()
+
+        if (_.isEmpty(multiTopicMapping)) {
+            throw new Error('Someting\'s wrong with muliTopic config!')
         }
 
-        const kafka = new KafkaAvro({
-            clientId: "data-producer",
-            brokers: config.brokerOptions.brokers,
-            avro: {
-                url: setup.config.schemaRegistry
+        kafka = new Kafka(config.brokerOptions)
+        let jsonProducer = kafka.producer(config.producerOptions)
+
+        jsonProducer.on(jsonProducer.events.CONNECT, async () => {
+
+            if (setup.config.topicsToCreate) {
+                await createTopics(kafka)
             }
+
+            if (isAvroRequired()) {
+
+                kafka = new KafkaAvro(config.brokerOptions)
+                let avroProducer = kafka.avro.producer(config.producerOptions)
+
+                avroProducer.on(avroProducer.events.CONNECT, async () => {
+                    await onReady()
+                })
+
+                avroProducer.on(avroProducer.events.DISCONNECT, async (err) => {
+                    await onError(err)
+                })
+
+                producers.avro = avroProducer
+
+                await avroProducer.connect()
+
+            } else {
+                await onReady()
+            }
+
         })
 
-        kafkaProducer = kafka.avro.producer()
+        jsonProducer.on(jsonProducer.events.DISCONNECT, async () => {
+            await onError(err)
+        })
+
+        producers.json = jsonProducer
+
+        await jsonProducer.connect()
 
     } else {
-        kafkaProducer = kafka.producer(config.producerOptions)
+
+        if (setup.config.format == 'avro') {
+
+            checkSchemaRegistry()
+
+            kafka = new KafkaAvro(config.brokerOptions)
+            producers.avro = kafka.avro.producer(config.producerOptions)
+
+        } else {
+            kafka = new Kafka(config.brokerOptions)
+            producers.json = kafka.producer(config.producerOptions)
+        }
+
+        producers[0].on(kafkaProducer.events.CONNECT, async () => {
+            if (setup.config.topicsToCreate) {
+                await createTopics(kafka)
+            }
+            await onReady(kafkaProducer)
+        })
+
+        producers[0].on(kafkaProducer.events.DISCONNECT, async (err) => {
+            await onError(err)
+        })
+
+        await producers[0].connect()
     }
-
-    kafkaProducer.on(kafkaProducer.events.CONNECT, async () => {
-        await onReady(kafkaProducer)
-    })
-
-    kafkaProducer.on(kafkaProducer.events.DISCONNECT, async (err) => {
-        await onError()
-    })
-
-    await kafkaProducer.connect()
 
 }
 
 let createTopics = async (kafka) => {
 
-    if (setup.config.topicsToCreate) {
+    let topics = []
 
-        let topics = []
+    _.forEach(_.split(setup.config.topicsToCreate.replace(/\s/g, ""), ","), topicEntry => {
 
-        _.forEach(_.split(setup.config.topicsToCreate.replace(/\s/g, ""), ","), topicEntry => {
+        let topicParams = _.split(topicEntry, ":")
 
-            let topicParams = _.split(topicEntry, ":")
-
-            topics.push({
-                topic: topicParams[0],
-                numPartitions: topicParams[1],
-                replicationFactor: topicParams[2]
-            })
-
+        topics.push({
+            topic: topicParams[0],
+            numPartitions: topicParams[1],
+            replicationFactor: topicParams[2]
         })
 
-        const admin = kafka.admin()
+    })
 
-        await admin.connect()
+    const admin = kafka.admin()
 
-        await admin.createTopics({
-            validateOnly: false,
-            waitForLeaders: true,
-            timeout: 20000,
-            topics: topics
-        }).then(success => {
-            info("Topic Creation " + (success ? "[OK]" : "[NOK]\n"))
-        })
+    await admin.connect()
 
-        await admin.disconnect()
+    await admin.createTopics({
+        validateOnly: false,
+        waitForLeaders: true,
+        timeout: 20000,
+        topics: topics
+    }).then(success => {
+        info("Topic Creation " + (success ? "[OK]" : "[NOK]\n"))
+    })
 
-    }
+    await admin.disconnect()
 
 }
 
-let send = async (kafkaProducer, topic, message) => {
+let createMultiTopicMapping = () => {
+
+    // "events:events-json:json:events-json-value,events:events-avro-default:avro:events-avro-default-value,events:events-avro-map:avro:events-avro-map-value"
+
+    try {
+
+        let multiTopicMapping = []
+
+        if (setup.config.multiTopics) {
+
+            _.forEach(_.split(setup.config.multiTopics.replace(/\s/g, ""), ","), entry => {
+
+                let topicParams = _.split(entry, ":")
+
+                multiTopicMapping.push({
+                    entity: topicParams[0],
+                    topic: topicParams[1],
+                    format: topicParams[2],
+                    subject: topicParams[3]
+                })
+
+            })
+
+        }
+
+        return multiTopicMapping
+
+    } catch (err) {
+        throw new Error(`Parsing multi topics failed!\n${err.message}`)
+    }
+}
+
+let send = async (topic, message, entity) => {
 
     if (setup.isProd()) {
 
-        if (setup.format == 'avro') {
-
-            info(message)
-
-            await kafkaProducer.send({
-                    topic: topic,
-                    messages: [{
-                        subject: "events-value",
-                        version: "latest",
-                        value: message
-                        // value : JSON.stringify(message)
-                    }]
-                })
-                .then(res => {
-                    if (setup.isVerbose()) {
-                        info(res)
-                    }
-                })
-                .catch(error)
-
+        if (setup.config.multiTopics) {
+            // console.log('EVET BURDA')
+            sendToMultipleTopics(message, entity)
         } else {
-
-            await kafkaProducer.send({
-                    topic: topic,
-                    messages: [{
-                        value: JSON.stringify(message)
-                    }],
-                    acks: config.producerProperties.acks,
-                    timeout: config.producerProperties.timeout,
-                    compression: config.producerProperties.compression
-                })
-                .then(res => {
-                    if (setup.isVerbose()) {
-                        info(res)
-                    }
-                })
-                .catch(error)
-
+            // console.log('bazen BURDA')
+            sendToSingleTopic(topic, message)
         }
 
     } else {
@@ -140,19 +195,73 @@ let send = async (kafkaProducer, topic, message) => {
 
 }
 
-let sendEvent = (producer, event) => {
-    send(producer, config.topicOptions.events, event)
+let sendToMultipleTopics = async (message, entity) => {
+
+    _.forEach(multiTopicMapping, async (v) => {
+        if (entity == v.entity) {
+            // console.log(entity)
+            // console.log(v.entity)
+            // console.log(message)
+            if (v.format == 'avro') {
+                sendToSingleTopicAsAvro(v.topic, message, v.subject)
+            } else {
+                sendToSingleTopicAsJson(v.topic, message)
+            }
+        }
+    })
+
 }
 
-let sendUser = (producer, user) => {
-    send(producer, config.topicOptions.users, user)
+let sendToSingleTopic = async (topic, message) => {
+    setup.config.format == 'avro' ? sendToSingleTopicAsAvro(topic, message) : sendToSingleTopicAsJson(topic, message)
+}
+
+let sendToSingleTopicAsAvro = async (topic, message, subject) => {
+    await producers.avro.send({
+            topic: topic,
+            messages: [{
+                subject: subject || `${topic}-value`,
+                version: "latest",
+                value: message
+            }]
+        })
+        .then(res => {
+            if (setup.isVerbose()) {
+                info(res)
+            }
+        })
+        .catch(error)
+}
+
+let sendToSingleTopicAsJson = async (topic, message) => {
+    await producers.json.send({
+            topic: topic,
+            messages: [{
+                value: JSON.stringify(message)
+            }],
+            acks: config.producerProperties.acks,
+            timeout: config.producerProperties.timeout,
+            compression: config.producerProperties.compression
+        })
+        .then(res => {
+            if (setup.isVerbose()) {
+                info(res)
+            }
+        })
+        .catch(error)
+}
+
+let sendEvent = (event) => {
+    send(config.topicOptions.events, event, ENTITY_EVENT)
+}
+
+let sendUser = (user) => {
+    send(config.topicOptions.users, user, ENTITY_USER)
 }
 
 export default {
-    newInstance: newInstance,
-    initProducer: initProducer,
-    createTopics: createTopics,
-    send: send,
-    sendEvent : sendEvent,
-    sendUser : sendUser
+    initProducer,
+    send,
+    sendEvent,
+    sendUser
 }

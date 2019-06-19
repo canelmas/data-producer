@@ -1,7 +1,7 @@
 import _ from 'lodash'
 import {
     modes,
-    modeFromString,
+    setMode,
 } from "./modes"
 
 import {
@@ -43,6 +43,8 @@ let print = () => {
     info(`numOfUsers=${config.numOfUsers}`)
     info(`sessionPerUser=${config.sessionPerUser}`)
     info(`eventPerSession=${config.eventsPerSession}`)
+    info(`redisHost=${config.redisHost}`)
+    info(`redisPort=${config.redisPort}`)
     info(`dateFormat=${config.dateFormat}`)
     info(`topicsToCreate=${config.topicsToCreate}`)
     info(`format=${config.format}`)
@@ -50,17 +52,18 @@ let print = () => {
     info(`brokers=${config.brokers}`)
     info(`topicEvents=${config.topicEvents}`)
     info(`topicUsers=${config.topicUsers}`)
-    info(`schemaRegistry=${config.schemaRegistry}\n`)
+    info(`writeToMultiTopics=${config.multiTopics}`)
+    info(`schemaRegistry=${config.schemaRegistry}`)
 }
 
 const config = {
     env: process.env.ENV || "development",
-    verbose: process.env.VERBOSE || "true",
+    verbose: process.env.VERBOSE || "false",
     period: process.env.PERIOD_IN_MS || 5 * 1000,
     numOfUsers: process.env.NUM_OF_USERS || 1,
     sessionPerUser: process.env.SESSION_PER_USER || 1,
     eventsPerSession: process.env.EVENTS_PER_SESSION || 5,
-    mode: modeFromString(process.env.MODE) || modes.GENERATE_AND_SEND_EVENTS_AND_USERS,
+    mode: setMode(process.env.MODE) || modes.GENERATE_AND_SEND_EVENTS_AND_USERS,
     apps: (process.env.APP_IDS || "DemoApp").replace(" ", "").split(","),
     topicsToCreate: process.env.CREATE_TOPICS || undefined,
     scenario: process.env.EVENT_SCENARIO || "apm",
@@ -70,7 +73,10 @@ const config = {
     userDemographics: process.env.USER_DEMOGRAHPHICS || "false",
     topicUsers: process.env.TOPIC_USERS || "users",
     topicEvents: process.env.TOPIC_EVENTS || "events",
-    brokers: parseBrokers(process.env.BROKERS) || ["localhost:19092"]
+    brokers: parseBrokers(process.env.BROKERS) || ["localhost:19092"],
+    multiTopics : process.env.WRITE_TO_MULTI_TOPICS || undefined,
+    redisHost : process.env.REDIS_HOST || 'localhost',
+    redisPort : process.env.REDIS_PORT || 6379    
 }
 
 export default {

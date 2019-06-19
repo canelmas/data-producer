@@ -1,19 +1,59 @@
 import redis from 'redis'
 import _ from 'lodash'
+import configRedis from './config/redis'
 
-let init = (onReady, onError) => {
-    redisClient = redis.createClient(configRedis)
+let client = null
 
-    redisClient.on('ready', async () => {
-        await onReady(redisClient)
+let init = (onReady, onError) => {        
+    client = redis.createClient(configRedis)
+    
+    client.on('ready', async () => {        
+        await onReady()
     })
 
-    redisClient.on('error', async (err) => {
+    client.on('error', async (err) => {        
         await onError(err)
+    })
+    
+}
+
+let get = (key, onSuccess, onError) => {
+    client.get(key, (err, result) => {
+        if (result) {
+            onSuccess(result)
+        } else {
+            onError(err)
+        }
     })
 }
 
-let scan = (client, cursor, callback, finalize) => {
+let set = (key, val, onSuccess) => {
+    client.set(key, val, onSuccess)
+}
+
+let print = () => {
+    client.print
+}
+
+let getRandomValue = (onSuccess, onError) => {
+
+    client.send_command("RANDOMKEY", (err, key) => {
+        if (key) {            
+            get(key, (err, result) => {
+                if (result) {
+                    onSuccess(result)
+                } else {
+                    onError(err)
+                }
+            })
+        } else {
+            onError(err)
+        }
+    })
+
+}
+
+let scan = (cursor, callback, finalize) => {
 
     client.scan(cursor, "MATCH", "*", "COUNT", 200, (err, reply) => {
 
@@ -44,6 +84,10 @@ let scan = (client, cursor, callback, finalize) => {
 }
 
 export default {
-    init: init,
-    scan : scan
+    init,
+    scan,
+    get,
+    set,
+    getRandomValue,
+    print
 }

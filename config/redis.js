@@ -1,4 +1,6 @@
+import setup from '../setup'
+
 export default {
-  host: process.env.REDIS_HOST || 'localhost',
-  port: process.env.REDIS_PORT || 6379
+  host : setup.config.redisHost,
+  port : setup.config.redisPort
 }

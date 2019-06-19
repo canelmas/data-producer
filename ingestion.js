@@ -17,21 +17,21 @@ import {
     getSessionStopTime,
     getSessionDuration
 } from './util';
-import { modes } from './modes'
+import {
+    modes
+} from './modes'
 
-let sendUsersOnRedis = (redisClient, kafkaProducer) => {
+let sendUsersOnRedis = () => {
 
     let cursor = 0
 
-    Redis.scan(redisClient, cursor, (key) => {
+    Redis.scan(cursor, (key) => {
 
-        redisClient.get(key, (err, user_info) => {
-
-            if (user_info) {
-                sendUser(JSON.parse(user_info), kafkaProducer)
-            } else {
-                error(err)
-            }
+        Redis.get(key, (result) => {
+            console.log(result)
+            sendUser(JSON.parse(result))
+        }, (err) => {
+            error(err)
         })
 
     }, () => {
@@ -40,13 +40,13 @@ let sendUsersOnRedis = (redisClient, kafkaProducer) => {
 
 }
 
-let generateAndPersistUsersOntoRedis = (redisClient) => {
+let generateAndPersistUsersOntoRedis = () => {
 
     for (var k = 0; k < setup.config.numOfUsers; k++) {
         let userInfo = UserGenerator.generate()
 
-        if (setup.isProd()) {
-            redisClient.set(userInfo["aid"], JSON.stringify(userInfo), redisClient.print)
+        if (setup.isProd()) {            
+            Redis.set(userInfo["aid"], JSON.stringify(userInfo), Redis.print)
         } else {
             prettyPrint(userInfo)
         }
@@ -56,51 +56,34 @@ let generateAndPersistUsersOntoRedis = (redisClient) => {
 
 }
 
-let readUsersFromRedisAndSendEvents = (redisClient, kafkaProducer) => {
+let readUsersFromRedisAndSendEvents = () => {
 
     setInterval(() => {
 
         for (var k = 0; k < setup.config.numOfUsers; k++) {
 
-            redisClient.send_command("RANDOMKEY", (err, aid) => {
+            Redis.getRandomValue((userInfo) => {
 
-                if (aid) {
+                let jsonUser = JSON.parse(userInfo)                
 
-                    redisClient.get(aid, (err, userInfo) => {
+                // create new device based on user's last device id
+                let deviceInfo = DeviceGenerator.generate(jsonUser["ldid"])
 
-                        if (userInfo) {
-
-                            let jsonUser = JSON.parse(userInfo)
-
-                            // create new device based on user's last device id
-                            let deviceInfo = DeviceGenerator.generate(jsonUser["ldid"])
-
-                            // create user sessions
-                            for (var i = 0; i < setup.config.sessionPerUser; i++) {
-
-                                // create session events
-                                createAndSendSessionEvents(jsonUser, deviceInfo, kafkaProducer)
-
-                            }
-
-                        } else {
-                            error(err)
-                        }
-
-                    })
-
-                } else {
-                    error(err)
+                // create user sessions
+                for (var i = 0; i < setup.config.sessionPerUser; i++) {
+                    // create session events
+                    createAndSendSessionEvents(jsonUser, deviceInfo)
                 }
 
-            })
-
+            }, (err) => {
+                error(err)
+            })            
         }
 
     }, setup.config.period)
 }
 
-let generateAndSendEventsAndUsers = (kafkaProducer) => {
+let generateAndSendEventsAndUsers = () => {
 
     setInterval(() => {
 
@@ -118,12 +101,12 @@ let generateAndSendEventsAndUsers = (kafkaProducer) => {
             for (var i = 0; i < setup.config.sessionPerUser; i++) {
 
                 // session events
-                createAndSendSessionEvents(appId, userInfo, deviceInfo, kafkaProducer)
+                createAndSendSessionEvents(appId, userInfo, deviceInfo)
 
             }
 
             // send user
-            sendUser(userInfo, kafkaProducer)
+            sendUser(userInfo)
 
         }
 
@@ -131,7 +114,7 @@ let generateAndSendEventsAndUsers = (kafkaProducer) => {
 
 }
 
-let createAndSendSessionEvents = (appId, userInfo, deviceInfo, kafkaProducer) => {
+let createAndSendSessionEvents = (appId, userInfo, deviceInfo) => {
 
     let sessionInfo = SessionGenerator.generate()
 
@@ -146,8 +129,7 @@ let createAndSendSessionEvents = (appId, userInfo, deviceInfo, kafkaProducer) =>
     //         sessionInfo["clientSession"],
     //         userInfo["aid"],
     //         userInfo["cid"],
-    //         appId),
-    //     kafkaProducer)
+    //         appId))
 
     // fire session events
     let sessionEvents = EventGenerator.generateSessionEvents(
@@ -161,7 +143,7 @@ let createAndSendSessionEvents = (appId, userInfo, deviceInfo, kafkaProducer) =>
         appId)
 
     _.forEach(sessionEvents, (e) => {
-        sendEvent(e, kafkaProducer)
+        sendEvent(e)
     })
 
     // fire clientSessionStop  
@@ -180,27 +162,26 @@ let createAndSendSessionEvents = (appId, userInfo, deviceInfo, kafkaProducer) =>
     //         sessionInfo["clientSession"],
     //         userInfo["aid"],
     //         userInfo["cid"],
-    //         appId),
-    //     kafkaProducer)
+    //         appId))
 
 }
 
-let sendUser = async (user, kafkaProducer) => {
-    Kafka.sendUser(kafkaProducer, user)
+let sendUser = async (user) => {
+    Kafka.sendUser(user)
 }
 
-let sendEvent = async (event, kafkaProducer) => {
-    Kafka.sendEvent(kafkaProducer, event)
+let sendEvent = async (event) => {
+    Kafka.sendEvent(event)
 }
 
-export default (redisClient, kafkaProducer) => {
+export default () => {
     if (setup.config.mode == modes.SEND_USERS_ON_REDIS) {
-        sendUsersOnRedis(redisClient)
+        sendUsersOnRedis()
     } else if (setup.config.mode == modes.GENERATE_AND_WRITE_USERS_TO_REDIS) {
-        generateAndPersistUsersOntoRedis(redisClient)
+        generateAndPersistUsersOntoRedis()
     } else if (setup.config.mode == modes.GENERATE_AND_SEND_EVENTS_WITH_USERS_READ_FROM_REDIS) {
-        readUsersFromRedisAndSendEvents(redisClient, kafkaProducer)
+        readUsersFromRedisAndSendEvents()
     } else {
-        generateAndSendEventsAndUsers(kafkaProducer)
+        generateAndSendEventsAndUsers()
     }
 }

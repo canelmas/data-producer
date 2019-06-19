@@ -48,12 +48,17 @@ const exceptions = [
     "SSLHandshakeException",
     "MalformedURLException",
     "UnkownHostException",
-    "SocketException"
+    "SocketException",
+    "HttpRetryException",
+    "InterruptedByTimeoutException",
+    "InterruptedIOException"
 ]
 
 const errorMessages = [
     "Please Try Again Later",
-    "Something Went Terribly Wrong"
+    "Something Went Terribly Wrong",
+    "Wow, something's really wrong",
+    "Oopsie!"
 ]
 
 const apmEvents = [
@@ -149,7 +154,7 @@ let randomPath = () => {
 
     let path = ""
 
-    let level = _.random(1, 3)
+    let level = _.random(1, 2)
 
     _.times(level, () => {
         path += "/".concat(faker.lorem.word())
@@ -176,7 +181,7 @@ let newHttpCall = () => {
         ht: randomHost(),
         h: randomHeaders(),
         ct: randomConnectionType(),
-        et: _.sample(["dob", "ndn", "other"]),
+        et: _.sample(["et1", "et2", "et3", "et4", "et5", "et6"]),
         ec: !isSuccess ? errorCode : null,
         em: !isSuccess ? randomErrorMessage(errorCode) : null,
         s: isSuccess,
