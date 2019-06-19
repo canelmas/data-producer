@@ -84,30 +84,32 @@ let initProducer = async (onReady, onError) => {
 
     } else {
 
+        let producer = null
+
         if (setup.config.format == 'avro') {
 
             checkSchemaRegistry()
 
             kafka = new KafkaAvro(config.brokerOptions)
-            producers.avro = kafka.avro.producer(config.producerOptions)
+            producer = producers.avro = kafka.avro.producer(config.producerOptions)            
 
         } else {
             kafka = new Kafka(config.brokerOptions)
-            producers.json = kafka.producer(config.producerOptions)
-        }
+            producer = producers.json = kafka.producer(config.producerOptions)            
+        }        
 
-        producers[0].on(kafkaProducer.events.CONNECT, async () => {
+        producer.on(producer.events.CONNECT, async () => {
             if (setup.config.topicsToCreate) {
                 await createTopics(kafka)
             }
-            await onReady(kafkaProducer)
+            await onReady()
         })
 
-        producers[0].on(kafkaProducer.events.DISCONNECT, async (err) => {
+        producer.on(producer.events.DISCONNECT, async (err) => {
             await onError(err)
         })
 
-        await producers[0].connect()
+        await producer.connect()
     }
 
 }
@@ -146,9 +148,7 @@ let createTopics = async (kafka) => {
 }
 
 let createMultiTopicMapping = () => {
-
-    // "events:events-json:json:events-json-value,events:events-avro-default:avro:events-avro-default-value,events:events-avro-map:avro:events-avro-map-value"
-
+    
     try {
 
         let multiTopicMapping = []
@@ -181,11 +181,9 @@ let send = async (topic, message, entity) => {
 
     if (setup.isProd()) {
 
-        if (setup.config.multiTopics) {
-            // console.log('EVET BURDA')
+        if (setup.config.multiTopics) {            
             sendToMultipleTopics(message, entity)
-        } else {
-            // console.log('bazen BURDA')
+        } else {            
             sendToSingleTopic(topic, message)
         }
 
@@ -198,10 +196,7 @@ let send = async (topic, message, entity) => {
 let sendToMultipleTopics = async (message, entity) => {
 
     _.forEach(multiTopicMapping, async (v) => {
-        if (entity == v.entity) {
-            // console.log(entity)
-            // console.log(v.entity)
-            // console.log(message)
+        if (entity == v.entity) {            
             if (v.format == 'avro') {
                 sendToSingleTopicAsAvro(v.topic, message, v.subject)
             } else {

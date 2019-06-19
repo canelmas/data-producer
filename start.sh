@@ -11,6 +11,7 @@ start() {
         -e NUM_OF_USERS=5 \
         -e SESSION_PER_USER=2 \
         -e EVENTS_PER_SESSION=20 \
+        -e EXCLUDE_SESSION_EVENTS="true"
         -e TOPIC_USERS=users \
         -e TOPIC_EVENTS=events \
         -e CREATE_TOPICS="events:1:1,users:1:1" \
