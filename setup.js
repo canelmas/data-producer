@@ -43,6 +43,7 @@ let print = () => {
     info(`numOfUsers=${config.numOfUsers}`)
     info(`sessionPerUser=${config.sessionPerUser}`)
     info(`eventPerSession=${config.eventsPerSession}`)
+    info(`excludeSessionEvents=${config.excludeSessionEvents}`)    
     info(`redisHost=${config.redisHost}`)
     info(`redisPort=${config.redisPort}`)
     info(`dateFormat=${config.dateFormat}`)
@@ -63,6 +64,7 @@ const config = {
     numOfUsers: process.env.NUM_OF_USERS || 1,
     sessionPerUser: process.env.SESSION_PER_USER || 1,
     eventsPerSession: process.env.EVENTS_PER_SESSION || 5,
+    excludeSessionEvents: process.env.EXCLUDE_SESSION_EVENTS ? process.env.EXCLUDE_SESSION_EVENTS == "true" : false,
     mode: setMode(process.env.MODE) || modes.GENERATE_AND_SEND_EVENTS_AND_USERS,
     apps: (process.env.APP_IDS || "DemoApp").replace(" ", "").split(","),
     topicsToCreate: process.env.CREATE_TOPICS || undefined,

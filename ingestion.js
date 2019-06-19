@@ -45,7 +45,7 @@ let generateAndPersistUsersOntoRedis = () => {
     for (var k = 0; k < setup.config.numOfUsers; k++) {
         let userInfo = UserGenerator.generate()
 
-        if (setup.isProd()) {            
+        if (setup.isProd()) {
             Redis.set(userInfo["aid"], JSON.stringify(userInfo), Redis.print)
         } else {
             prettyPrint(userInfo)
@@ -64,7 +64,7 @@ let readUsersFromRedisAndSendEvents = () => {
 
             Redis.getRandomValue((userInfo) => {
 
-                let jsonUser = JSON.parse(userInfo)                
+                let jsonUser = JSON.parse(userInfo)
 
                 // create new device based on user's last device id
                 let deviceInfo = DeviceGenerator.generate(jsonUser["ldid"])
@@ -77,7 +77,7 @@ let readUsersFromRedisAndSendEvents = () => {
 
             }, (err) => {
                 error(err)
-            })            
+            })
         }
 
     }, setup.config.period)
@@ -121,15 +121,17 @@ let createAndSendSessionEvents = (appId, userInfo, deviceInfo) => {
     let sessionStartTime = sessionInfo["clientSession"]["startDateTime"]
 
     // fire clientSessionStart
-    // sendEvent(
-    //     EventGenerator.generate(
-    //         'clientSessionStart',
-    //         sessionStartTime,
-    //         deviceInfo,
-    //         sessionInfo["clientSession"],
-    //         userInfo["aid"],
-    //         userInfo["cid"],
-    //         appId))
+    if (!setup.config.excludeSessionEvents) {
+        sendEvent(
+            EventGenerator.generate(
+                'clientSessionStart',
+                sessionStartTime,
+                deviceInfo,
+                sessionInfo["clientSession"],
+                userInfo["aid"],
+                userInfo["cid"],
+                appId))
+    }
 
     // fire session events
     let sessionEvents = EventGenerator.generateSessionEvents(
@@ -154,15 +156,17 @@ let createAndSendSessionEvents = (appId, userInfo, deviceInfo) => {
         duration: getSessionDuration(sessionStartTime, sessionStoptime)
     })
 
-    // sendEvent(
-    //     EventGenerator.generate(
-    //         'clientSessionStop',
-    //         sessionStoptime,
-    //         deviceInfo,
-    //         sessionInfo["clientSession"],
-    //         userInfo["aid"],
-    //         userInfo["cid"],
-    //         appId))
+    if (!setup.config.excludeSessionEvents) {
+        sendEvent(
+            EventGenerator.generate(
+                'clientSessionStop',
+                sessionStoptime,
+                deviceInfo,
+                sessionInfo["clientSession"],
+                userInfo["aid"],
+                userInfo["cid"],
+                appId))
+    }
 
 }
 
