@@ -42,18 +42,18 @@ let print = () => {
     info(`period=${config.period}`)
     info(`numOfUsers=${config.numOfUsers}`)
     info(`sessionPerUser=${config.sessionPerUser}`)
-    info(`eventPerSession=${config.eventsPerSession}`)
+    info(`eventsPerSession=${config.eventsPerSession}`)
     info(`excludeSessionEvents=${config.excludeSessionEvents}`)    
+    info(`addUserDemographics=${config.addUserDemographics}`)
+    info(`dateFormat=${config.dateFormat}`)
     info(`redisHost=${config.redisHost}`)
     info(`redisPort=${config.redisPort}`)
-    info(`dateFormat=${config.dateFormat}`)
-    info(`topicsToCreate=${config.topicsToCreate}`)
-    info(`format=${config.format}`)
-    info(`userDemographics=${config.userDemographics}`)
     info(`brokers=${config.brokers}`)
+    info(`format=${config.format}`)
+    info(`topicsToCreate=${config.topicsToCreate}`)
     info(`topicEvents=${config.topicEvents}`)
     info(`topicUsers=${config.topicUsers}`)
-    info(`writeToMultiTopics=${config.multiTopics}`)
+    info(`multiTopics=${config.multiTopics}`)
     info(`schemaRegistry=${config.schemaRegistry}`)
 }
 
@@ -72,13 +72,13 @@ const config = {
     format: process.env.FORMAT || 'json',
     dateFormat: process.env.DATE_FORMAT || "YYYY-MM-DDTHH:mm:ssZ",
     schemaRegistry: process.env.SCHEMA_REGISTRY || undefined,
-    userDemographics: process.env.USER_DEMOGRAPHICS || "false",
+    addUserDemographics: process.env.ADD_USER_DEMOGRAPHICS || "false",
     topicUsers: process.env.TOPIC_USERS || "users",
     topicEvents: process.env.TOPIC_EVENTS || "events",
     brokers: parseBrokers(process.env.BROKERS) || ["localhost:19092"],
     multiTopics : process.env.WRITE_TO_MULTI_TOPICS || undefined,
-    redisHost : process.env.REDIS_HOST || 'localhost',
-    redisPort : process.env.REDIS_PORT || 6379    
+    redisHost : process.env.REDIS_HOST || undefined,
+    redisPort : process.env.REDIS_PORT || undefined
 }
 
 export default {
