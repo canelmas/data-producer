@@ -257,6 +257,6 @@ let sendUser = (user) => {
 export default {
     initProducer,
     send,
-    sendEvent,
+    sendEvent,    
     sendUser
 }

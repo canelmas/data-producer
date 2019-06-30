@@ -11,7 +11,7 @@ docker run --name=data-producer -d --restart=always \
         -e NUM_OF_USERS=3 \
         -e SESSION_PER_USER=5 \
         -e EVENTS_PER_SESSION=20 \
-        -e USER_DEMOGRAHPHICS="false" \
+        -e ADD_USER_DEMOGRAPHICS="false" \
         -e REDIS_HOST=redis \
         -e REDIS_PORT=6379 \
         -e TOPIC_USERS=users \

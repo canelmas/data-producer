@@ -72,7 +72,7 @@ const config = {
     format: process.env.FORMAT || 'json',
     dateFormat: process.env.DATE_FORMAT || "YYYY-MM-DDTHH:mm:ssZ",
     schemaRegistry: process.env.SCHEMA_REGISTRY || undefined,
-    userDemographics: process.env.USER_DEMOGRAHPHICS || "false",
+    userDemographics: process.env.USER_DEMOGRAPHICS || "false",
     topicUsers: process.env.TOPIC_USERS || "users",
     topicEvents: process.env.TOPIC_EVENTS || "events",
     brokers: parseBrokers(process.env.BROKERS) || ["localhost:19092"],

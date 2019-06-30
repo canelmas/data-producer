@@ -12,7 +12,7 @@
   "license": "ISC",
   "dependencies": {
     "faker": "^4.1.0",
-    "kafkajs": "^1.8.0",
+    "kafkajs": "^1.9.3",
     "kafkajs-avro": "^1.0.4",
     "lodash": "^4.17.11",
     "moment": "^2.22.2",

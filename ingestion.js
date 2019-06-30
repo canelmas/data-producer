@@ -27,8 +27,7 @@ let sendUsersOnRedis = () => {
 
     Redis.scan(cursor, (key) => {
 
-        Redis.get(key, (result) => {
-            console.log(result)
+        Redis.get(key, (result) => {            
             sendUser(JSON.parse(result))
         }, (err) => {
             error(err)
@@ -142,7 +141,7 @@ let createAndSendSessionEvents = (appId, userInfo, deviceInfo) => {
         sessionInfo["clientSession"],
         userInfo["aid"],
         userInfo["cid"],
-        appId)
+        appId)    
 
     _.forEach(sessionEvents, (e) => {
         sendEvent(e)

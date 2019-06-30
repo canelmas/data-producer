@@ -86,13 +86,13 @@ const statusCodes = [
 ]
 
 const headers = {
-        "Content-Encoding": "gzip",
-        "Content-Length": String(_.random(5, 5000)),
-        "Accept": _.sample(["text/html", "multipart/form-data"]),
-        "Content-Language" : _.sample(["de-DE", "en-US", "en-CA"]),
-        "Server": "Apache",
-        "Content-Type" : "application/x-www-form-urlencoded",
-        "Accept-Charset" : _.sample(["utf-8", "iso-8859-15"])
+    "Content-Encoding": "gzip",
+    "Content-Length": String(_.random(5, 5000)),
+    "Accept": _.sample(["text/html", "multipart/form-data"]),
+    "Content-Language": _.sample(["de-DE", "en-US", "en-CA"]),
+    "Server": "Apache",
+    "Content-Type": "application/x-www-form-urlencoded",
+    "Accept-Charset": _.sample(["utf-8", "iso-8859-15"])
 }
 
 let randomHeaders = () => {
@@ -163,9 +163,9 @@ let randomPath = () => {
     return path
 }
 
-let getRandomAttributes = (num) => {    
-    return _.zipObject(_.times(num, () => faker.internet.domainWord()), _.times(num, () => faker.internet.domainWord()))    
-  }
+let getRandomAttributes = (num) => {
+    return _.zipObject(_.times(num, () => faker.internet.domainWord()), _.times(num, () => faker.internet.domainWord()))
+}
 
 let newHttpCall = () => {
 
@@ -186,15 +186,15 @@ let newHttpCall = () => {
         em: !isSuccess ? randomErrorMessage(errorCode) : null,
         s: isSuccess,
         d: randomDuration(),
-        sc: randomStatusCode(),        
+        sc: randomStatusCode(),
         rqs: randomContentSize(),
         rps: randomContentSize(),
         m: randomHttpMethod(),
         sch: randomSchema(),
         ph: randomPath(),
         viewId: Buffer.from(viewLabel, "ascii").toString("base64"),
-        viewLabel: viewLabel,
-        extras : Boolean(_.sample([true, false])) ? getRandomAttributes(_.random(1,10)) : null        
+        viewLabel: viewLabel,        
+        extras: Boolean(_.sample([true, false])) ? getRandomAttributes(_.random(1, 10)) : null
     }
 
 }
@@ -218,8 +218,8 @@ let newNetworkError = () => {
         em: randomErrorMessage(),
         ct: randomConnectionType(),
         viewId: Buffer.from(viewLabel, "ascii").toString("base64"),
-        viewLabel: viewLabel,
-        extras : Boolean(_.sample([true, false])) ? getRandomAttributes(_.random(1,10)) : null                
+        viewLabel: viewLabel,        
+        extras: Boolean(_.sample([true, false])) ? getRandomAttributes(_.random(1, 10)) : null
     }
 
 }
@@ -244,5 +244,5 @@ let render = (event, data) => {
 }
 
 export default {
-    takeOne: generateEvent
+    takeOne: generateEvent    
 }
