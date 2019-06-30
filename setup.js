@@ -46,6 +46,7 @@ let print = () => {
     info(`excludeSessionEvents=${config.excludeSessionEvents}`)    
     info(`addUserDemographics=${config.addUserDemographics}`)
     info(`dateFormat=${config.dateFormat}`)
+    info(`appIds=${config.apps}`)    
     info(`redisHost=${config.redisHost}`)
     info(`redisPort=${config.redisPort}`)
     info(`brokers=${config.brokers}`)
