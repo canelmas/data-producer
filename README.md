@@ -2,7 +2,6 @@
 
 ```bash
 docker run --name=data-producer -d --restart=always \
-        --network $2 \
         -e ENV=production \
         -e VERBOSE="true" \
         -e MODE=default \
@@ -23,7 +22,7 @@ docker run --name=data-producer -d --restart=always \
         -e FORMAT=avro \
         -e WRITE_TO_MULTI_TOPICS="event:events-json:json,event:events-avro:avro:events-avro-value" \
         -e SCHEMA_REGISTRY=http://schema-registry:8081 \
-        canelmas/data-producer:$1
+        canelmas/data-producer:4.1.0
 ```
 ## Env Variables
 
@@ -136,7 +135,7 @@ Default is __localhost:19092__.
 
 If set, create Kafka topics. 
 
-This configuration expects comma separated list of entries with the following format : `topic name (required) : number of partitions (required) : replications factor (required)`
+This configuration expects comma separated list of entries with the following format : `topic name(required):number of partitions(required):replications factor(required)`
 
 For example, `CREATE_TOPICS=A:3:1,B:1:1` configuration will create two topics named A and B. Topic A will have 2 as the partition number and 1 as the replication factor whereas topic B will have its partition number and replication factor set to 1.
 
@@ -179,7 +178,7 @@ Default is __undefined__.
 Convenient when the same record must be written to multiple topics.
 
 This configuration expects comma separated list of entries with the following format : 
-`entity type (required) : topic name (required) : serialization format (required) : subject name if avro is used (optional)`
+`entity type(required):topic name(required):serialization format(required):subject name if avro is used(optional)`
 
 Supported entity types are `user` for user data and `event` for event data.
 
