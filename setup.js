@@ -69,7 +69,7 @@ const config = {
     mode: setMode(process.env.MODE) || modes.GENERATE_AND_SEND_EVENTS_AND_USERS,
     apps: (process.env.APP_IDS || "DemoApp").replace(" ", "").split(","),
     topicsToCreate: process.env.CREATE_TOPICS || undefined,
-    scenario: process.env.EVENT_SCENARIO || "apm",
+    scenario: process.env.EVENT_SCENARIO || "random",
     format: process.env.FORMAT || 'json',
     dateFormat: process.env.DATE_FORMAT || "YYYY-MM-DDTHH:mm:ssZ",
     schemaRegistry: process.env.SCHEMA_REGISTRY || undefined,
