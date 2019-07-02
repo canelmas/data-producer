@@ -24,6 +24,8 @@ docker run --name=data-producer -d --restart=always \
         -e SCHEMA_REGISTRY=http://schema-registry:8081 \
         canelmas/data-producer:4.1.0
 ```
+Images are available on [DockerHub](https://hub.docker.com/r/canelmas/data-producer).
+
 ## Env Variables
 
 ### `ENV`
