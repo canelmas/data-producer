@@ -1,6 +1,6 @@
 {
   "name": "data-producer",
-  "version": "1.0.0",
+  "version": "4.2.0",
   "description": "Fake data producer for Kafka",
   "author": "Can Elmas <canelm@gmail.com>",
   "main": "index.js",
@@ -22,7 +22,8 @@
     "uuid": "^3.3.2"
   },
   "devDependencies": {
-    "babel-cli": "^6.26.0",
+    "@babel/cli": "^7.5.0",
+    "@babel/core": "^7.5.4",
     "babel-preset-es2015": "^6.24.1",
     "nodemon": "^1.19.1",
     "rimraf": "^2.6.3"
