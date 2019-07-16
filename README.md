@@ -22,7 +22,9 @@ docker run --name=data-producer -d --restart=always \
         -e FORMAT=avro \
         -e WRITE_TO_MULTI_TOPICS="event:events-json:json,event:events-avro:avro:events-avro-value" \
         -e SCHEMA_REGISTRY=http://schema-registry:8081 \
-        canelmas/data-producer:4.1.0
+        -e WEBHOOK=http://localhost:3000/v1/events \
+        -e WEBHOOK_HEADERS='x-api-key:f33be30e-7695-4817-9f0c-03cb567c5732,lovely-header:value'
+        canelmas/data-producer:4.2.0
 ```
 Images are available on [DockerHub](https://hub.docker.com/r/canelmas/data-producer).
 

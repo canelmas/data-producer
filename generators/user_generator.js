@@ -20,7 +20,9 @@ let generate = (appId) => {
     return alreadyGeneratedUser
 
   } else {
+
     return generateUser(uuid(), appId)
+    
   }
 
 }
