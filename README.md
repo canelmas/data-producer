@@ -89,6 +89,14 @@ Number of events to generate for each user session.
 
 Default is __5__.
 
+### `DEVICE_ID`
+
+Device id to be used for each event.
+
+Once this option is set, only one user is generated and used throughout the event generation.
+
+Default is __undefined__.
+
 ### `APP_IDS`
 
 Comma separated app names to use randomly as `appId` for each event. (e.g. `APP_IDS=DemoApp,FooApp,BarApp,ZooWebApp`)
@@ -194,5 +202,19 @@ We're basically saying producer to write `event` entity (generated event data) t
 - `events-avro` topic with subject name `events-avro-value` in `avro` format.
 
 If `avro` is used, make sure before to set `SCHEMA_REGISTRY` and to register the schema under the subject name `events-avro-value`.
+
+Default is __undefined__.
+
+### `WEBHOOK`
+
+Convenient when you need to post events to a webhook in addition to kafka.
+
+Only events are posted to specified webhook; users are omitted.
+
+Default is __undefined__.
+
+### `WEBHOOK_HEADERS`
+
+Comma separated headers to pass while using `WEBHOOK` (e.g. `x-api-key:ABCD-XYZ,lovely-header:lovely-header-value`)
 
 Default is __undefined__.

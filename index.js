@@ -11,21 +11,22 @@ import {
 import startIngestion from './ingestion'
 import Kafka from './kafka'
 import Redis from './redis'
+import Webhook from './webhook'
 
-let exit = () => {
+let exit = () => {  
   process.exit()
 }
 
-let init = () => {  
-  
+let init = () => {
+
   setup.print()
 
-  if (isRedisRequired(setup.config.mode)) {    
+  if (isRedisRequired(setup.config.mode)) {
     Redis.init(onRedisReady, onRedisError)
-  } else {    
+  } else {
     Kafka.initProducer(onKafkaProducerReady, onKafkaProducerError)
   }
-  
+
 }
 
 let onRedisReady = async () => {
@@ -39,7 +40,16 @@ let onRedisError = async (err) => {
 }
 
 let onKafkaProducerReady = async () => {
-  info("Kafka [OK]")  
+  info("Kafka [OK]")
+  if (setup.config.webhook) {
+    Webhook.init(onWebHookReady)
+  } else {
+    startIngestion()
+  }
+}
+
+let onWebHookReady = async () => {
+  info("WebHook [OK]")
   startIngestion()
 }
 

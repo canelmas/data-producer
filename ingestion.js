@@ -20,6 +20,7 @@ import {
 import {
     modes
 } from './modes'
+import WebHook from "./webhook";
 
 let sendUsersOnRedis = () => {
 
@@ -175,6 +176,10 @@ let sendUser = async (user) => {
 
 let sendEvent = async (event) => {
     Kafka.sendEvent(event)
+
+    if (setup.config.webhook) {
+        WebHook.post(setup.config.webhook, [event])   
+    }
 }
 
 export default () => {

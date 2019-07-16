@@ -47,6 +47,7 @@ let print = () => {
     info(`addUserDemographics=${config.addUserDemographics}`)
     info(`dateFormat=${config.dateFormat}`)
     info(`appIds=${config.apps}`)    
+    info(`deviceId=${config.deviceId}`)    
     info(`redisHost=${config.redisHost}`)
     info(`redisPort=${config.redisPort}`)
     info(`brokers=${config.brokers}`)
@@ -56,6 +57,8 @@ let print = () => {
     info(`topicUsers=${config.topicUsers}`)
     info(`multiTopics=${config.multiTopics}`)
     info(`schemaRegistry=${config.schemaRegistry}`)
+    info(`webhook=${config.webhook}`)
+    info(`webhookHeaders=${config.webhookHeaders}`)
 }
 
 const config = {
@@ -68,6 +71,7 @@ const config = {
     excludeSessionEvents: process.env.EXCLUDE_SESSION_EVENTS ? process.env.EXCLUDE_SESSION_EVENTS == "true" : false,
     mode: setMode(process.env.MODE) || modes.GENERATE_AND_SEND_EVENTS_AND_USERS,
     apps: (process.env.APP_IDS || "DemoApp").replace(" ", "").split(","),
+    deviceId : process.env.DEVICE_ID || undefined,
     topicsToCreate: process.env.CREATE_TOPICS || undefined,
     scenario: process.env.EVENT_SCENARIO || "random",
     format: process.env.FORMAT || 'json',
@@ -79,7 +83,9 @@ const config = {
     brokers: parseBrokers(process.env.BROKERS) || ["localhost:19092"],
     multiTopics : process.env.WRITE_TO_MULTI_TOPICS || undefined,
     redisHost : process.env.REDIS_HOST || undefined,
-    redisPort : process.env.REDIS_PORT || undefined
+    redisPort : process.env.REDIS_PORT || undefined,
+    webhook : process.env.WEBHOOK || undefined,
+    webhookHeaders : process.env.WEBHOOK_HEADERS || undefined
 }
 
 export default {
