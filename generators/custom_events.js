@@ -163,21 +163,6 @@ const dashboardTabs = ['clara',
   'gonzalo'
 ]
 
-const attributes = {
-  "left_menu_item_pressed": getMenuItemAttributes,
-  "dashboard_tab_selected": getDashboardTabAttributes,
-  "shortcut_added": getShortcutAttributes,
-  "shortcut_pressed": getShortcutAttributes,
-  "shortcut_deleted": getShortcutAttributes,
-  "welcome_screen_refreshed": getWelcomeScreenAttributes,
-  "campaign_selected": getCampaignAttributes,
-  "campaign_displayed": getCampaignAttributes,
-  "campaign_not_interested_button_pressed": getCampaignAttributes,
-  "campaign_maybe_later_button_pressed": getCampaignAttributes,
-  "campaign_get_ref_code_button_pressed": getCampaignAttributes,
-  "campaign_interested_button_pressed": getCampaignAttributes
-}
-
 let generateRandomAttributes = (event) => {
 
   if (_.has(attributes, event)) {
@@ -253,6 +238,21 @@ let getMenuItemAttributes = () => {
     ustMenu: _.sample(menuTitles),
     kullaniciTipi: _.sample(customerTypes)
   }
+}
+
+const attributes = {
+  "left_menu_item_pressed": getMenuItemAttributes,
+  "dashboard_tab_selected": getDashboardTabAttributes,
+  "shortcut_added": getShortcutAttributes,
+  "shortcut_pressed": getShortcutAttributes,
+  "shortcut_deleted": getShortcutAttributes,
+  "welcome_screen_refreshed": getWelcomeScreenAttributes,
+  "campaign_selected": getCampaignAttributes,
+  "campaign_displayed": getCampaignAttributes,
+  "campaign_not_interested_button_pressed": getCampaignAttributes,
+  "campaign_maybe_later_button_pressed": getCampaignAttributes,
+  "campaign_get_ref_code_button_pressed": getCampaignAttributes,
+  "campaign_interested_button_pressed": getCampaignAttributes
 }
 
 const events = [
