@@ -13,7 +13,7 @@ import Kafka from './kafka'
 import Redis from './redis'
 import Webhook from './webhook'
 
-let exit = () => {  
+let exit = () => {
   process.exit()
 }
 
@@ -23,8 +23,10 @@ let init = () => {
 
   if (isRedisRequired(setup.config.mode)) {
     Redis.init(onRedisReady, onRedisError)
-  } else {
+  } else if (setup.config.brokers) {
     Kafka.initProducer(onKafkaProducerReady, onKafkaProducerError)
+  } else if (setup.config.webhook) {
+    Webhook.init(onWebHookReady)
   }
 
 }

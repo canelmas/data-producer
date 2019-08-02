@@ -43,11 +43,11 @@ let print = () => {
     info(`numOfUsers=${config.numOfUsers}`)
     info(`sessionPerUser=${config.sessionPerUser}`)
     info(`eventsPerSession=${config.eventsPerSession}`)
-    info(`excludeSessionEvents=${config.excludeSessionEvents}`)    
+    info(`excludeSessionEvents=${config.excludeSessionEvents}`)
     info(`addUserDemographics=${config.addUserDemographics}`)
     info(`dateFormat=${config.dateFormat}`)
-    info(`appIds=${config.apps}`)    
-    info(`deviceId=${config.deviceId}`)    
+    info(`appIds=${config.apps}`)
+    info(`deviceId=${config.deviceId}`)
     info(`redisHost=${config.redisHost}`)
     info(`redisPort=${config.redisPort}`)
     info(`brokers=${config.brokers}`)
@@ -78,9 +78,9 @@ const config = {
     dateFormat: process.env.DATE_FORMAT || "YYYY-MM-DDTHH:mm:ssZ",
     schemaRegistry: process.env.SCHEMA_REGISTRY || undefined,
     addUserDemographics: process.env.ADD_USER_DEMOGRAPHICS || "false",
-    topicUsers: process.env.TOPIC_USERS || "users",
-    topicEvents: process.env.TOPIC_EVENTS || "events",
-    brokers: parseBrokers(process.env.BROKERS) || ["localhost:19092"],
+    topicUsers: process.env.TOPIC_USERS || undefined,
+    topicEvents: process.env.TOPIC_EVENTS || undefined,
+    brokers: parseBrokers(process.env.BROKERS) || undefined,
     multiTopics : process.env.WRITE_TO_MULTI_TOPICS || undefined,
     redisHost : process.env.REDIS_HOST || undefined,
     redisPort : process.env.REDIS_PORT || undefined,
