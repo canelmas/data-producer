@@ -175,7 +175,9 @@ let sendUser = async (user) => {
 }
 
 let sendEvent = async (event) => {
-    Kafka.sendEvent(event)
+    if (setup.config.brokers) {
+        Kafka.sendEvent(event)
+    }
 
     if (setup.config.webhook) {        
         WebHook.post(setup.config.webhook, [event])   
