@@ -21,6 +21,7 @@ import {
     modes
 } from './modes'
 import WebHook from "./webhook";
+import outputs from './outputs';
 
 let sendUsersOnRedis = () => {
 
@@ -171,15 +172,39 @@ let createAndSendSessionEvents = (appId, userInfo, deviceInfo) => {
 }
 
 let sendUser = async (user) => {
-    Kafka.sendUser(user)
+
+    if (setup.config.sendUsers) {
+
+        if (setup.hasOutput(outputs.KAFKA)) {
+            Kafka.sendUser(user)
+        }    
+    
+        if (setup.hasOutput(outputs.WEBHOOK)) {        
+            WebHook.post(setup.config.webhookUrl, [user])   
+        }
+    
+        if (setup.hasOutput(outputs.CONSOLE)) {
+            prettyPrint(user)
+        }
+        
+    }
+
 }
 
 let sendEvent = async (event) => {
-    Kafka.sendEvent(event)
 
-    if (setup.config.webhook) {        
-        WebHook.post(setup.config.webhook, [event])   
+    if (setup.hasOutput(outputs.KAFKA)) {
+        Kafka.sendEvent(event)
     }
+
+    if (setup.hasOutput(outputs.WEBHOOK)) {        
+        WebHook.post(setup.config.webhookUrl, [event])   
+    }
+
+    if (setup.hasOutput(outputs.CONSOLE)) {
+        prettyPrint(event)
+    }
+
 }
 
 export default () => {

@@ -20,17 +20,15 @@ const ENTITY_USER = 'user'
 let producers = {}
 let multiTopicMapping = []
 
-let checkSchemaRegistry = () => {
-    if (!setup.config.schemaRegistry) {
-        throw new Error("Schema Registry is missing!")
-    }
-}
-
 let isAvroRequired = () => {
     return true
 }
 
-let initProducer = async (onReady, onError) => {
+let onError = async (err) => {    
+    error(err)
+}
+
+let initProducer = async (onReady) => {
 
     let kafka = null
 
@@ -57,11 +55,11 @@ let initProducer = async (onReady, onError) => {
                 let avroProducer = kafka.avro.producer(config.producerOptions)
 
                 avroProducer.on(avroProducer.events.CONNECT, async () => {
-                    await onReady()
+                    await onReady()                    
                 })
 
                 avroProducer.on(avroProducer.events.DISCONNECT, async (err) => {
-                    await onError(err)
+                    await onError(err)                    
                 })
 
                 producers.avro = avroProducer
@@ -69,13 +67,13 @@ let initProducer = async (onReady, onError) => {
                 await avroProducer.connect()
 
             } else {
-                await onReady()
+                await onReady()                
             }
 
         })
 
         jsonProducer.on(jsonProducer.events.DISCONNECT, async () => {
-            await onError(err)
+            await onError(err)            
         })
 
         producers.json = jsonProducer
@@ -88,25 +86,27 @@ let initProducer = async (onReady, onError) => {
 
         if (setup.config.format == 'avro') {
 
-            checkSchemaRegistry()
+            if (!setup.config.schemaRegistry) {
+                throw new Error("Schema Registry is missing!")
+            }
 
             kafka = new KafkaAvro(config.brokerOptions)
-            producer = producers.avro = kafka.avro.producer(config.producerOptions)            
+            producer = producers.avro = kafka.avro.producer(config.producerOptions)
 
         } else {
             kafka = new Kafka(config.brokerOptions)
-            producer = producers.json = kafka.producer(config.producerOptions)            
-        }        
+            producer = producers.json = kafka.producer(config.producerOptions)
+        }
 
         producer.on(producer.events.CONNECT, async () => {
             if (setup.config.topicsToCreate) {
                 await createTopics(kafka)
             }
-            await onReady()
+            await onReady()            
         })
 
         producer.on(producer.events.DISCONNECT, async (err) => {
-            await onError(err)
+            await onError(err)            
         })
 
         await producer.connect()
@@ -148,7 +148,7 @@ let createTopics = async (kafka) => {
 }
 
 let createMultiTopicMapping = () => {
-    
+
     try {
 
         let multiTopicMapping = []
@@ -181,9 +181,9 @@ let send = async (topic, message, entity) => {
 
     if (setup.isProd()) {
 
-        if (setup.config.multiTopics) {            
+        if (setup.config.multiTopics) {
             sendToMultipleTopics(message, entity)
-        } else {            
+        } else {
             sendToSingleTopic(topic, message)
         }
 
@@ -196,7 +196,7 @@ let send = async (topic, message, entity) => {
 let sendToMultipleTopics = async (message, entity) => {
 
     _.forEach(multiTopicMapping, async (v) => {
-        if (entity == v.entity) {            
+        if (entity == v.entity) {
             if (v.format == 'avro') {
                 sendToSingleTopicAsAvro(v.topic, message, v.subject)
             } else {
@@ -246,17 +246,17 @@ let sendToSingleTopicAsJson = async (topic, message) => {
         .catch(error)
 }
 
-let sendEvent = (event) => {
+let sendEvent = async (event) => {
     send(config.topicOptions.events, event, ENTITY_EVENT)
 }
 
-let sendUser = (user) => {
+let sendUser = async (user) => {
     send(config.topicOptions.users, user, ENTITY_USER)
 }
 
 export default {
     initProducer,
     send,
-    sendEvent,    
+    sendEvent,
     sendUser
 }

@@ -1,20 +1,24 @@
 import redis from 'redis'
 import _ from 'lodash'
 import configRedis from './config/redis'
+import { error  } from "./logger";
 
 let client = null
 
-let init = (onReady, onError) => {        
+let onError = async (err) => {
+    error(err)
+}
+
+let init = async (onRedisReady) => {
     client = redis.createClient(configRedis)
-    
-    client.on('ready', async () => {        
-        await onReady()
+
+    client.on('ready', async () => {
+        await onRedisReady()
     })
 
-    client.on('error', async (err) => {        
+    client.on('error', async (err) => {
         await onError(err)
     })
-    
 }
 
 let get = (key, onSuccess, onError) => {
@@ -38,7 +42,7 @@ let print = () => {
 let getRandomValue = (onSuccess, onError) => {
 
     client.send_command("RANDOMKEY", (err, key) => {
-        if (key) {            
+        if (key) {
             get(key, (err, result) => {
                 if (result) {
                     onSuccess(result)

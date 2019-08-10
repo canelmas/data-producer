@@ -12,50 +12,55 @@ import startIngestion from './ingestion'
 import Kafka from './kafka'
 import Redis from './redis'
 import Webhook from './webhook'
+import outputs from "./outputs";
 
-let exit = () => {  
-  process.exit()
+let exit = (err) => {
+  error(err)
+  process.exit(1)
 }
 
-let init = () => {
-
-  setup.print()
-
-  if (isRedisRequired(setup.config.mode)) {
-    Redis.init(onRedisReady, onRedisError)
-  } else {
-    Kafka.initProducer(onKafkaProducerReady, onKafkaProducerError)
-  }
-
+let onWebhookReady = () => {
+  info('Webhook [OK]')
 }
 
-let onRedisReady = async () => {
-  info("Redis [OK]")
-  Kafka.initProducer(onKafkaProducerReady, onKafkaProducerError)
-}
-
-let onRedisError = async (err) => {
-  error(`Redis [NOK] ${err}`)
-  exit()
-}
-
-let onKafkaProducerReady = async () => {
-  info("Kafka [OK]")
-  if (setup.config.webhook) {
-    Webhook.init(onWebHookReady)
-  } else {
-    startIngestion()
-  }
-}
-
-let onWebHookReady = async () => {
-  info("WebHook [OK]")
+let onKafkaReady = () => {
+  info('Kafka [OK]')
   startIngestion()
 }
 
-let onKafkaProducerError = async (err) => {
-  error(`Kafka [NOK] ${err}`)
-  exit()
+let onRedisReady = () => {
+  info('Redis [OK]')
+
+  if (setup.hasOutput(outputs.KAFKA)) {
+    Kafka.initProducer(onKafkaReady)
+  } else {
+    startIngestion()
+  }
+
+}
+
+let init = async () => {
+
+  try {
+
+    setup.print()
+
+    if (setup.hasOutput(outputs.WEBHOOK)) {
+      await Webhook.init(onWebhookReady)
+    }
+
+    if (isRedisRequired(setup.config.mode)) {
+      Redis.init(onRedisReady)
+    } else if (setup.hasOutput(outputs.KAFKA)) {
+      Kafka.initProducer(onKafkaReady)
+    } else {
+      startIngestion()
+    }
+
+  } catch (err) {
+    exit(err)
+  }
+
 }
 
 init()

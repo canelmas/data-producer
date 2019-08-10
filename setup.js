@@ -20,22 +20,51 @@ let isProd = () => {
     return config.env == "production"
 }
 
-let parseBrokers = (brokerString) => {
+let parse = (data) => {
 
-    if (!brokerString) {
+    if (!data) {
         return undefined
     }
 
-    let brokers = []
-    _.forEach(_.split(brokerString.replace(/\s/g, ""), ","), broker => {
-        brokers.push(broker)
-    })
+    return _.split(data.replace(/\s/g, ""), ",") 
+}
 
-    return brokers
+let hasOutput = (output) => {
+    return config.output.includes(output)
+}
+
+const config = {
+    env: process.env.ENV || "development",
+    output: parse(process.env.OUTPUT) || ['console'],
+    verbose: process.env.VERBOSE || "false",
+    period: process.env.PERIOD_IN_MS || 5 * 1000,
+    numOfUsers: process.env.NUM_OF_USERS || 1,
+    sessionPerUser: process.env.SESSION_PER_USER || 1,
+    eventsPerSession: process.env.EVENTS_PER_SESSION || 5,
+    excludeSessionEvents: process.env.EXCLUDE_SESSION_EVENTS ? process.env.EXCLUDE_SESSION_EVENTS == 'true' : false,
+    mode: setMode(process.env.MODE) || modes.GENERATE_AND_SEND_EVENTS_AND_USERS,    
+    apps : parse(process.env.APP_IDS) || ['DemoApp'],
+    deviceId : process.env.DEVICE_ID || undefined,
+    topicsToCreate: process.env.CREATE_TOPICS || undefined,
+    scenario: process.env.EVENT_SCENARIO || "random",
+    format: process.env.FORMAT || 'json',
+    dateFormat: process.env.DATE_FORMAT || "YYYY-MM-DDTHH:mm:ssZ",
+    schemaRegistry: process.env.SCHEMA_REGISTRY || undefined,
+    addUserDemographics: process.env.ADD_USER_DEMOGRAPHICS || "false",
+    topicUsers: process.env.TOPIC_USERS || "users",
+    topicEvents: process.env.TOPIC_EVENTS || "events",
+    brokers: parse(process.env.BROKERS) || ["localhost:19092"],
+    multiTopics : process.env.WRITE_TO_MULTI_TOPICS || undefined,
+    redisHost : process.env.REDIS_HOST || undefined,
+    redisPort : process.env.REDIS_PORT || undefined,
+    webhookUrl : process.env.WEBHOOK_URL || undefined,
+    webhookHeaders : process.env.WEBHOOK_HEADERS || undefined,
+    sendUsers : process.env.SEND_USERS ? process.env.SEND_USERS === 'true' : true
 }
 
 let print = () => {
     info(`env=${config.env}`)
+    info(`output=${config.output}`)
     info(`mode=${config.mode}`)
     info(`verbose=${config.verbose}`)
     info(`scenario=${config.scenario}`)
@@ -43,7 +72,8 @@ let print = () => {
     info(`numOfUsers=${config.numOfUsers}`)
     info(`sessionPerUser=${config.sessionPerUser}`)
     info(`eventsPerSession=${config.eventsPerSession}`)
-    info(`excludeSessionEvents=${config.excludeSessionEvents}`)    
+    info(`excludeSessionEvents=${config.excludeSessionEvents}`)   
+    info(`sendUsers=${config.sendUsers}`)    
     info(`addUserDemographics=${config.addUserDemographics}`)
     info(`dateFormat=${config.dateFormat}`)
     info(`appIds=${config.apps}`)    
@@ -57,35 +87,8 @@ let print = () => {
     info(`topicUsers=${config.topicUsers}`)
     info(`multiTopics=${config.multiTopics}`)
     info(`schemaRegistry=${config.schemaRegistry}`)
-    info(`webhook=${config.webhook}`)
+    info(`webhookUrl=${config.webhookUrl}`)
     info(`webhookHeaders=${config.webhookHeaders}`)
-}
-
-const config = {
-    env: process.env.ENV || "development",
-    verbose: process.env.VERBOSE || "false",
-    period: process.env.PERIOD_IN_MS || 5 * 1000,
-    numOfUsers: process.env.NUM_OF_USERS || 1,
-    sessionPerUser: process.env.SESSION_PER_USER || 1,
-    eventsPerSession: process.env.EVENTS_PER_SESSION || 5,
-    excludeSessionEvents: process.env.EXCLUDE_SESSION_EVENTS ? process.env.EXCLUDE_SESSION_EVENTS == "true" : false,
-    mode: setMode(process.env.MODE) || modes.GENERATE_AND_SEND_EVENTS_AND_USERS,
-    apps: (process.env.APP_IDS || "DemoApp").replace(" ", "").split(","),
-    deviceId : process.env.DEVICE_ID || undefined,
-    topicsToCreate: process.env.CREATE_TOPICS || undefined,
-    scenario: process.env.EVENT_SCENARIO || "random",
-    format: process.env.FORMAT || 'json',
-    dateFormat: process.env.DATE_FORMAT || "YYYY-MM-DDTHH:mm:ssZ",
-    schemaRegistry: process.env.SCHEMA_REGISTRY || undefined,
-    addUserDemographics: process.env.ADD_USER_DEMOGRAPHICS || "false",
-    topicUsers: process.env.TOPIC_USERS || "users",
-    topicEvents: process.env.TOPIC_EVENTS || "events",
-    brokers: parseBrokers(process.env.BROKERS) || ["localhost:19092"],
-    multiTopics : process.env.WRITE_TO_MULTI_TOPICS || undefined,
-    redisHost : process.env.REDIS_HOST || undefined,
-    redisPort : process.env.REDIS_PORT || undefined,
-    webhook : process.env.WEBHOOK || undefined,
-    webhookHeaders : process.env.WEBHOOK_HEADERS || undefined
 }
 
 export default {
@@ -93,5 +96,6 @@ export default {
     print,
     isProd,
     isVerbose,
-    getRandomAppId
+    getRandomAppId,
+    hasOutput
 }
