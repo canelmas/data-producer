@@ -8,7 +8,7 @@ import _ from 'lodash'
 
 let instance = undefined
 
-let init = async (onReady) => {
+let init = (onReady) => {
 
     if (!setup.config.webhookUrl) {
         throw new Error('Webhook url is missing!')
@@ -30,7 +30,7 @@ let init = async (onReady) => {
         })
     }
 
-    await onReady()
+    onReady()
 
 }
 

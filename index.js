@@ -39,14 +39,14 @@ let onRedisReady = () => {
 
 }
 
-let init = async () => {
+let init = () => {
 
   try {
 
     setup.print()
 
     if (setup.hasOutput(outputs.WEBHOOK)) {
-      await Webhook.init(onWebhookReady)
+      Webhook.init(onWebhookReady)
     }
 
     if (isRedisRequired(setup.config.mode)) {
