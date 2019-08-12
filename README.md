@@ -50,9 +50,9 @@ Default is __false__.
 
 ### `OUTPUT`
 
-- __`"console"`__ : Generated data is written to console.
-- __`"kafka"`__ : Generated data is written to kafka.
-- __`"kafka"`__ : Generated data is posted to webhook.
+- __`console`__ : Generated data is written to console.
+- __`kafka`__ : Generated data is written to kafka.
+- __`kafka`__ : Generated data is posted to webhook.
 
 Default is __console__.
 
