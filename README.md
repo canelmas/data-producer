@@ -3,6 +3,7 @@
 ```bash
 docker run --name=data-producer -d --restart=always \
         -e ENV=production \
+        -e OUTPUT="console,kafka,webhook" \
         -e VERBOSE="true" \
         -e MODE=default \
         -e EVENT_SCENARIO=random \
@@ -11,6 +12,7 @@ docker run --name=data-producer -d --restart=always \
         -e SESSION_PER_USER=5 \
         -e EVENTS_PER_SESSION=20 \
         -e APP_IDS="LovelyApp,LoveliestApp,HappyApp,HappiestApp" \
+        -e SEND_USERS="true" \
         -e ADD_USER_DEMOGRAPHICS="false" \
         -e DATE_FORMAT="YYYY-MM-DDTHH:mm:ssZ" \
         -e REDIS_HOST=redis \
@@ -22,9 +24,9 @@ docker run --name=data-producer -d --restart=always \
         -e FORMAT=avro \
         -e WRITE_TO_MULTI_TOPICS="event:events-json:json,event:events-avro:avro:events-avro-value" \
         -e SCHEMA_REGISTRY=http://schema-registry:8081 \
-        -e WEBHOOK=http://localhost:3000/v1/events \
+        -e WEBHOOK_URL=http://localhost:3000/v1/events \
         -e WEBHOOK_HEADERS='x-api-key:f33be30e-7695-4817-9f0c-03cb567c5732,lovely-header:value'
-        canelmas/data-producer:4.2.0
+        canelmas/data-producer:4.3.0
 ```
 Images are available on [DockerHub](https://hub.docker.com/r/canelmas/data-producer).
 
@@ -32,19 +34,27 @@ Images are available on [DockerHub](https://hub.docker.com/r/canelmas/data-produ
 
 ### `ENV`
 
-- __`production`__ : Messages are written to Kafka.
-- __`development`__ : Messages are written to console.
+- __`production`__ : Messages are written to `output` values.
+- __`development`__ : Messages are written to console only.
 
 Default is __development__.
 
 ### `VERBOSE`
 
 - __`"true"`__ : Kafka Record metadata is written to console for each message.
-- __`"false"`__ : Kafka Record metadata is not written to console for each message.
+- __`"false"`__ : Kafka Record metadata is not written to console.
 
 This option makes only sense when `ENV=production`.
 
 Default is __false__.
+
+### `OUTPUT`
+
+- __`"console"`__ : Generated data is written to console.
+- __`"kafka"`__ : Generated data is written to kafka.
+- __`"kafka"`__ : Generated data is posted to webhook.
+
+Default is __console__.
 
 ### `MODE`
 
@@ -79,7 +89,7 @@ Number of users to generate and send for each period.
 
 Default is __1__.
 
-### `SESSION_PER_USER`
+### `SESSIONS_PER_USER`
 
 Number of sessions to generate for each user within each period.
 
@@ -104,6 +114,12 @@ Default is __undefined__.
 Comma separated app names to use randomly as `appId` for each event. (e.g. `APP_IDS=DemoApp,FooApp,BarApp,ZooWebApp`)
 
 Default is __DemoApp__.
+
+### `SEND_USERS`
+
+Whether generated user data should be written to any output.
+
+Default is __true__.
 
 ### `ADD_USER_DEMOGRAPHICS`
 
@@ -207,9 +223,9 @@ If `avro` is used, make sure before to set `SCHEMA_REGISTRY` and to register the
 
 Default is __undefined__.
 
-### `WEBHOOK`
+### `WEBHOOK_URL`
 
-Convenient when you need to post events to a webhook in addition to kafka.
+Webhook url to post generated data.
 
 Only events are posted to specified webhook; users are omitted.
 
@@ -217,6 +233,6 @@ Default is __undefined__.
 
 ### `WEBHOOK_HEADERS`
 
-Comma separated headers to pass while using `WEBHOOK` (e.g. `x-api-key:ABCD-XYZ,lovely-header:lovely-header-value`)
+Comma separated headers to pass while using `WEBHOOK_URL` (e.g. `x-api-key:ABCD-XYZ,lovely-header:lovely-header-value`)
 
 Default is __undefined__.

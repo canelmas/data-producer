@@ -71,7 +71,7 @@ let readUsersFromRedisAndSendEvents = () => {
                 let deviceInfo = DeviceGenerator.generate(jsonUser["ldid"])
 
                 // create user sessions
-                for (var i = 0; i < setup.config.sessionPerUser; i++) {
+                for (var i = 0; i < setup.config.sessionsPerUser; i++) {
                     // create session events
                     createAndSendSessionEvents(jsonUser, deviceInfo)
                 }
@@ -99,7 +99,7 @@ let generateAndSendEventsAndUsers = () => {
             let deviceInfo = DeviceGenerator.generate(userInfo["ldid"])
 
             // sessions
-            for (var i = 0; i < setup.config.sessionPerUser; i++) {
+            for (var i = 0; i < setup.config.sessionsPerUser; i++) {
 
                 // session events
                 createAndSendSessionEvents(appId, userInfo, deviceInfo)
@@ -191,7 +191,7 @@ let sendUser = async (user) => {
 
 }
 
-let sendEvent = async (event) => {
+let sendEvent = async (event) => {    
 
     if (setup.hasOutput(outputs.KAFKA)) {
         Kafka.sendEvent(event)
@@ -201,13 +201,13 @@ let sendEvent = async (event) => {
         WebHook.post(setup.config.webhookUrl, [event])   
     }
 
-    if (setup.hasOutput(outputs.CONSOLE)) {
+    if (setup.hasOutput(outputs.CONSOLE)) {        
         prettyPrint(event)
     }
 
 }
 
-export default () => {
+export default () => {    
     if (setup.config.mode == modes.SEND_USERS_ON_REDIS) {
         sendUsersOnRedis()
     } else if (setup.config.mode == modes.GENERATE_AND_WRITE_USERS_TO_REDIS) {

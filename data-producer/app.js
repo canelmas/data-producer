@@ -1,5 +1,3 @@
-import _ from 'lodash';
-
 import {
   isRedisRequired
 } from './modes';
@@ -12,7 +10,7 @@ import startIngestion from './ingestion'
 import Kafka from './kafka'
 import Redis from './redis'
 import Webhook from './webhook'
-import outputs from "./outputs";
+import outputs from "./outputs"
 
 let exit = (err) => {
   error(err)

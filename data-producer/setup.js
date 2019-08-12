@@ -34,12 +34,12 @@ let hasOutput = (output) => {
 }
 
 const config = {
-    env: process.env.ENV || "development",
+    env: process.env.ENV || "production",
     output: parse(process.env.OUTPUT) || ['console'],
     verbose: process.env.VERBOSE || "false",
     period: process.env.PERIOD_IN_MS || 5 * 1000,
     numOfUsers: process.env.NUM_OF_USERS || 1,
-    sessionPerUser: process.env.SESSION_PER_USER || 1,
+    sessionsPerUser: process.env.SESSIONS_PER_USER || 1,
     eventsPerSession: process.env.EVENTS_PER_SESSION || 5,
     excludeSessionEvents: process.env.EXCLUDE_SESSION_EVENTS ? process.env.EXCLUDE_SESSION_EVENTS == 'true' : false,
     mode: setMode(process.env.MODE) || modes.GENERATE_AND_SEND_EVENTS_AND_USERS,    
@@ -70,7 +70,7 @@ let print = () => {
     info(`scenario=${config.scenario}`)
     info(`period=${config.period}`)
     info(`numOfUsers=${config.numOfUsers}`)
-    info(`sessionPerUser=${config.sessionPerUser}`)
+    info(`sessionsPerUser=${config.sessionsPerUser}`)
     info(`eventsPerSession=${config.eventsPerSession}`)
     info(`excludeSessionEvents=${config.excludeSessionEvents}`)   
     info(`sendUsers=${config.sendUsers}`)    

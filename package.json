@@ -1,13 +1,14 @@
 {
   "name": "data-producer",
-  "version": "4.2.0",
-  "description": "Fake data producer for Kafka",
+  "version": "4.3.0",
+  "description": "Fake data producer for kafka, console and http endpoint",
   "author": "Can Elmas <canelm@gmail.com>",
-  "main": "index.js",
+  "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "rimraf dist/ && babel ./ --out-dir dist/ --ignore ./**/node_modules",    
-    "start": "npm run build && nodemon dist/index.js"
+    "build": "npm run clean && babel data-producer --out-dir dist/ --ignore ./**/node_modules",
+    "start": "npm run build && nodemon dist/app.js",
+    "clean": "rimraf dist/"
   },
   "license": "ISC",
   "dependencies": {

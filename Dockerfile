@@ -4,6 +4,6 @@ LABEL maintainer="Can Elmas <canelm@gmail.com>"
 WORKDIR /app
 COPY package*.json ./
 RUN npm install --production
-COPY . .
+COPY dist/ .
 
-CMD ["node", "dist/index.js"]
+CMD ["node", "app.js"]
