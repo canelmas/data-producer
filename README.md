@@ -53,7 +53,7 @@ Default is __false__.
 
 - __`console`__ : Generated data is written to console.
 - __`kafka`__ : Generated data is written to kafka.
-- __`kafka`__ : Generated data is posted to webhook.
+- __`webhook`__ : Generated data is posted to webhook.
 
 Default is __console__.
 
@@ -244,11 +244,11 @@ Escaped funnel template json string.
 
 Once this property is set, only funnel events will be created according to the template.
 
-*`probability`* for each funnel event indicates how likely that specific event will generated e.g. **1** means that the event will be generated each time; **0.2** means that specific event generation probability is 20% etc.
+__`probability`__ for each funnel event indicates how likely that specific event will be generated e.g. **1** means that the event will be generated each time; **0.2** means that specific event generation probability is 20%.
 
 In case of a not generated funnel event, a **`random`** event will be generated instead.
 
-*`attributes`* accepts `boolean`, `word`, `amount`, `uuid` and `number` values in order to generate random event attributes values. Default is __word__.
+__`attributes`__ accepts `boolean`, `word`, `amount`, `uuid` and `number` values in order to generate random event attributes values. Default is __word__.
 
 You may use [this](https://tools.knowledgewalls.com/jsontostring) to convert json to string.
 
