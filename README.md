@@ -26,7 +26,8 @@ docker run --name=data-producer -d --restart=always \
         -e SCHEMA_REGISTRY=http://schema-registry:8081 \
         -e WEBHOOK_URL=http://localhost:3000/v1/events \
         -e WEBHOOK_HEADERS='x-api-key:f33be30e-7695-4817-9f0c-03cb567c5732,lovely-header:value'
-        canelmas/data-producer:4.3.0
+        -e FUNNEL_TEMPLATE="{\"steps\":[{\"name\":\"A\",\"attributes\":{\"a_key_1\":\"word\",\"a_key_2\":\"number\"},\"probability\":0.6},{\"name\":\"B\",\"attributes\":{\"b_key_1\":\"amount\",\"b_key_2\":\"uuid\"},\"probability\":0.5},{\"name\":\"C\",\"probability\":0.9,\"attributes\":{\"c_key_1\":\"boolean\"}}]}" \         
+        canelmas/data-producer:4.4.0
 ```
 Images are available on [DockerHub](https://hub.docker.com/r/canelmas/data-producer).
 
@@ -234,5 +235,56 @@ Default is __undefined__.
 ### `WEBHOOK_HEADERS`
 
 Comma separated headers to pass while using `WEBHOOK_URL` (e.g. `x-api-key:ABCD-XYZ,lovely-header:lovely-header-value`)
+
+Default is __undefined__.
+
+### `FUNNEL_TEMPLATE`
+
+Escaped funnel template json string.
+
+Once this property is set, only funnel events will be created according to the template.
+
+*`probability`* for each funnel event indicates how likely that specific event will generated e.g. **1** means that the event will be generated each time; **0.2** means that specific event generation probability is 20% etc.
+
+In case of a not generated funnel event, a **`random`** event will be generated instead.
+
+*`attributes`* accepts `boolean`, `word`, `amount`, `uuid` and `number` values in order to generate random event attributes values. Default is __word__.
+
+You may use [this](https://tools.knowledgewalls.com/jsontostring) to convert json to string.
+
+Below is a sample template:
+
+```json
+{
+    "steps": [
+        {
+            "name": "A",
+            "attributes": {
+                "a_key_1": "word",
+                "a_key_2": "number",
+                "a_key_3": "amount",
+                "a_key_4": "uuid",
+                "a_key_5": "boolean"
+            },
+            "probability" : 0.8
+        },
+        {
+            "name": "B",
+            "attributes" : {
+                "b_key_1": "amount",
+                "b_key_2": "uuid"
+            },
+            "probability" : 0.5
+        },
+        {
+            "name": "C",                        
+            "attributes" : {
+                "c_key_1" : "boolean"
+            },
+            "probability" : 0.6
+        }
+    ]
+}
+```
 
 Default is __undefined__.

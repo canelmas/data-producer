@@ -22,6 +22,7 @@ import {
 } from './modes'
 import WebHook from "./webhook";
 import outputs from './outputs';
+import Funnel from "./funnel";
 
 let sendUsersOnRedis = () => {
 
@@ -29,7 +30,7 @@ let sendUsersOnRedis = () => {
 
     Redis.scan(cursor, (key) => {
 
-        Redis.get(key, (result) => {            
+        Redis.get(key, (result) => {
             sendUser(JSON.parse(result))
         }, (err) => {
             error(err)
@@ -134,20 +135,41 @@ let createAndSendSessionEvents = (appId, userInfo, deviceInfo) => {
                 appId))
     }
 
-    // fire session events
-    let sessionEvents = EventGenerator.generateSessionEvents(
-        setup.config.scenario,
-        setup.config.eventsPerSession,
-        sessionStartTime,
-        deviceInfo,
-        sessionInfo["clientSession"],
-        userInfo["aid"],
-        userInfo["cid"],
-        appId)    
+    // fire funnel events if set
+    if (setup.config.funnel) {
+            
+        let funnelEvents = Funnel.generateEvents(
+            sessionStartTime,
+            deviceInfo,
+            sessionInfo['clientSession'],
+            userInfo['aid'],
+            userInfo['cid'],
+            appId
+        ) 
 
-    _.forEach(sessionEvents, (e) => {
-        sendEvent(e)
-    })
+        _.forEach(funnelEvents, e => {
+            sendEvent(e)
+        })
+        
+
+    } else {
+
+        // fire session events
+        let sessionEvents = EventGenerator.generateSessionEvents(
+            setup.config.scenario,
+            setup.config.eventsPerSession,
+            sessionStartTime,
+            deviceInfo,
+            sessionInfo["clientSession"],
+            userInfo["aid"],
+            userInfo["cid"],
+            appId)
+
+        _.forEach(sessionEvents, e => {
+            sendEvent(e)
+        })
+
+    }
 
     // fire clientSessionStop  
     let sessionStoptime = getSessionStopTime(setup.eventsPerSession, sessionStartTime)
@@ -177,37 +199,37 @@ let sendUser = async (user) => {
 
         if (setup.hasOutput(outputs.KAFKA)) {
             Kafka.sendUser(user)
-        }    
-    
-        if (setup.hasOutput(outputs.WEBHOOK)) {        
-            WebHook.post(setup.config.webhookUrl, [user])   
         }
-    
+
+        if (setup.hasOutput(outputs.WEBHOOK)) {
+            WebHook.post(setup.config.webhookUrl, [user])
+        }
+
         if (setup.hasOutput(outputs.CONSOLE)) {
             prettyPrint(user)
         }
-        
+
     }
 
 }
 
-let sendEvent = async (event) => {    
+let sendEvent = async (event) => {
 
     if (setup.hasOutput(outputs.KAFKA)) {
         Kafka.sendEvent(event)
     }
 
-    if (setup.hasOutput(outputs.WEBHOOK)) {        
-        WebHook.post(setup.config.webhookUrl, [event])   
+    if (setup.hasOutput(outputs.WEBHOOK)) {
+        WebHook.post(setup.config.webhookUrl, [event])
     }
 
-    if (setup.hasOutput(outputs.CONSOLE)) {        
+    if (setup.hasOutput(outputs.CONSOLE)) {
         prettyPrint(event)
     }
 
 }
 
-export default () => {    
+export default () => {
     if (setup.config.mode == modes.SEND_USERS_ON_REDIS) {
         sendUsersOnRedis()
     } else if (setup.config.mode == modes.GENERATE_AND_WRITE_USERS_TO_REDIS) {

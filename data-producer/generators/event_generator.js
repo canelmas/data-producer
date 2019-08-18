@@ -83,7 +83,7 @@ export let generateSessionEvents = (scenario,
 
 }
 
-let generateSessionEvent = (scenario,
+export let generateSessionEvent = (scenario,
   eventCreationTime,
   deviceInfo,
   clientSession,
@@ -112,7 +112,7 @@ let generateSessionEvent = (scenario,
         appconnectId,
         customerId,
         appId)
-    case SCENARIO_APM:      
+    case SCENARIO_APM:
       return generateAPMEvent(eventCreationTime,
         deviceInfo,
         clientSession,
@@ -284,6 +284,8 @@ let generateEvent = (eventName,
 
 export default {
   generate,
+  generateSessionEvent,
   generateSessionEvents,
-  scenarios
+  scenarios,
+  generateEvent
 }

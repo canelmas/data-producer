@@ -3,6 +3,7 @@ import {
     modes,
     setMode,
 } from "./modes"
+import Funnel from "./funnel";
 
 import {
     info
@@ -59,7 +60,8 @@ const config = {
     redisPort : process.env.REDIS_PORT || undefined,
     webhookUrl : process.env.WEBHOOK_URL || undefined,
     webhookHeaders : process.env.WEBHOOK_HEADERS || undefined,
-    sendUsers : process.env.SEND_USERS ? process.env.SEND_USERS === 'true' : true
+    sendUsers : process.env.SEND_USERS ? process.env.SEND_USERS === 'true' : true,
+    funnel : process.env.FUNNEL_TEMPLATE ? Funnel.create(process.env.FUNNEL_TEMPLATE) : undefined
 }
 
 let print = () => {
@@ -89,6 +91,7 @@ let print = () => {
     info(`schemaRegistry=${config.schemaRegistry}`)
     info(`webhookUrl=${config.webhookUrl}`)
     info(`webhookHeaders=${config.webhookHeaders}`)
+    info(`funnel=${JSON.stringify(config.funnel)}`)
 }
 
 export default {
