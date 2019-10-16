@@ -15,7 +15,8 @@ import {
 } from './logger'
 import {
     getSessionStopTime,
-    getSessionDuration
+    getSessionDuration,
+    nextEventTime
 } from './util';
 import {
     modes
@@ -137,7 +138,7 @@ let createAndSendSessionEvents = (appId, userInfo, deviceInfo) => {
 
     // fire funnel events if set
     if (setup.config.funnel) {
-            
+
         let funnelEvents = Funnel.generateEvents(
             sessionStartTime,
             deviceInfo,
@@ -145,12 +146,22 @@ let createAndSendSessionEvents = (appId, userInfo, deviceInfo) => {
             userInfo['aid'],
             userInfo['cid'],
             appId
-        ) 
+        )
 
         _.forEach(funnelEvents, e => {
             sendEvent(e)
         })
-        
+
+
+    } else if (setup.config.mode == modes.GENERATE_AND_SEND_USERS) {
+
+        let eventCreationTime = nextEventTime(sessionStartTime)
+
+        // device.update.pushToken
+        sendEvent(EventGenerator.generatePushTokenEvent(eventCreationTime, deviceInfo, sessionInfo['clientSession'], userInfo['aid'], userInfo['cid'], appId))
+
+        // user.update
+        sendEvent(EventGenerator.generateUpdateUserEvent(userInfo, nextEventTime(eventCreationTime), deviceInfo, sessionInfo['clientSession'], userInfo['aid'], userInfo['cid'], appId))
 
     } else {
 
@@ -172,7 +183,7 @@ let createAndSendSessionEvents = (appId, userInfo, deviceInfo) => {
     }
 
     // fire clientSessionStop  
-    let sessionStoptime = getSessionStopTime(setup.eventsPerSession, sessionStartTime)
+    let sessionStoptime = getSessionStopTime(setup.config.mode == modes.GENERATE_AND_SEND_USERS ? 2 : setup.eventsPerSession, sessionStartTime)
 
     _.assignIn(sessionInfo["clientSession"], {
         stopDateTime: sessionStoptime,
@@ -190,6 +201,34 @@ let createAndSendSessionEvents = (appId, userInfo, deviceInfo) => {
                 userInfo["cid"],
                 appId))
     }
+
+}
+
+let generateAndSendUsers = () => {
+
+    setInterval(() => {
+
+        for (var k = 0; k < setup.config.numOfUsers; k++) {
+
+            let appId = setup.getRandomAppId()
+
+            // new user
+            let userInfo = UserGenerator.generate(appId)
+
+            // new device based on user's last device id
+            let deviceInfo = DeviceGenerator.generate(userInfo["ldid"])
+
+            // sessions
+            for (var i = 0; i < setup.config.sessionsPerUser; i++) {
+
+                // session events
+                createAndSendSessionEvents(appId, userInfo, deviceInfo)
+
+            }
+
+        }
+
+    }, setup.config.period);
 
 }
 
@@ -230,13 +269,22 @@ let sendEvent = async (event) => {
 }
 
 export default () => {
-    if (setup.config.mode == modes.SEND_USERS_ON_REDIS) {
-        sendUsersOnRedis()
-    } else if (setup.config.mode == modes.GENERATE_AND_WRITE_USERS_TO_REDIS) {
-        generateAndPersistUsersOntoRedis()
-    } else if (setup.config.mode == modes.GENERATE_AND_SEND_EVENTS_WITH_USERS_READ_FROM_REDIS) {
-        readUsersFromRedisAndSendEvents()
-    } else {
-        generateAndSendEventsAndUsers()
+
+    switch (setup.config.mode) {
+        case modes.SEND_USERS_ON_REDIS:
+            sendUsersOnRedis()
+            break;
+        case modes.GENERATE_AND_WRITE_USERS_TO_REDIS:
+            generateAndPersistUsersOntoRedis()
+            break;
+        case modes.GENERATE_AND_SEND_EVENTS_WITH_USERS_READ_FROM_REDIS:
+            readUsersFromRedisAndSendEvents()
+            break;
+        case modes.GENERATE_AND_SEND_USERS:
+            generateAndSendUsers()
+            break;
+        default:
+            generateAndSendEventsAndUsers()
+
     }
 }

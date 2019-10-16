@@ -206,6 +206,49 @@ let generateViewEvent = (eventCreationTime,
 
 }
 
+let generatePushTokenEvent = (eventCreationTime,
+  deviceInfo,
+  clientSession,
+  appconnectId,
+  customerId,
+  appId) => {
+  return generateEvent('device.update.pushToken', {
+      pushToken: uuid()
+    },
+    eventCreationTime,
+    deviceInfo,
+    clientSession,
+    appconnectId,
+    customerId,
+    appId
+  )
+}
+
+let generateUpdateUserEvent = (userInfo,
+  eventCreationTime,
+  deviceInfo,
+  clientSession,
+  appconnectId,
+  customerId,
+  appId) => {
+  return generateEvent('user.update',
+    {
+      phone: userInfo.phone,
+      fn : userInfo.fn,
+      ln : userInfo.ln,
+      gender : userInfo.gender,
+      maritalStatus : userInfo.maritalStatus,
+      dob : userInfo.dob
+    },
+    eventCreationTime,
+    deviceInfo,
+    clientSession,
+    appconnectId,
+    customerId,
+    appId
+  )
+}
+
 let generateRandomEvent = (eventCreationTime,
   deviceInfo,
   clientSession,
@@ -287,5 +330,7 @@ export default {
   generateSessionEvent,
   generateSessionEvents,
   scenarios,
-  generateEvent
+  generateEvent,
+  generatePushTokenEvent,
+  generateUpdateUserEvent
 }
