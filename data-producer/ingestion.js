@@ -165,7 +165,7 @@ let createAndSendSessionEvents = (appId, userInfo, deviceInfo) => {
 
     } else {
 
-        // fire session events
+        // fire session events => events between clientSessionStart and clientSessionStop
         let sessionEvents = EventGenerator.generateSessionEvents(
             setup.config.scenario,
             setup.config.eventsPerSession,
