@@ -40,14 +40,14 @@ export let generate = (eventName,
   eventCreationTime,
   deviceInfo,
   clientSession,
-  appconnectId,
+  aid,
   customerId,
   appId) => {
 
   return {
     eventId: uuid(),
     deviceId: deviceInfo["deviceId"],
-    appconnectId: appconnectId,
+    aid: aid,
     customerId: customerId,
     eventName: eventName,
     appId: appId,
@@ -64,7 +64,7 @@ export let generateSessionEvents = (scenario,
   sessionStartTime,
   deviceInfo,
   clientSession,
-  appconnectId,
+  aid,
   customerId,
   appId) => {
 
@@ -76,7 +76,7 @@ export let generateSessionEvents = (scenario,
       eventCreationTime,
       deviceInfo,
       clientSession,
-      appconnectId,
+      aid,
       customerId,
       appId)
   })
@@ -87,7 +87,7 @@ export let generateSessionEvent = (scenario,
   eventCreationTime,
   deviceInfo,
   clientSession,
-  appconnectId,
+  aid,
   customerId,
   appId) => {
   switch (scenario) {
@@ -95,28 +95,28 @@ export let generateSessionEvent = (scenario,
       return generateCommerceEvent(eventCreationTime,
         deviceInfo,
         clientSession,
-        appconnectId,
+        aid,
         customerId,
         appId)
     case SCENARIO_CUSTOM:
       return generateCustomEvent(eventCreationTime,
         deviceInfo,
         clientSession,
-        appconnectId,
+        aid,
         customerId,
         appId)
     case SCENARIO_VIEW:
       return generateViewEvent(eventCreationTime,
         deviceInfo,
         clientSession,
-        appconnectId,
+        aid,
         customerId,
         appId)
     case SCENARIO_APM:
       return generateAPMEvent(eventCreationTime,
         deviceInfo,
         clientSession,
-        appconnectId,
+        aid,
         customerId,
         appId)
     case SCENARIO_RANDOM:
@@ -124,7 +124,7 @@ export let generateSessionEvent = (scenario,
       return generateRandomEvent(eventCreationTime,
         deviceInfo,
         clientSession,
-        appconnectId,
+        aid,
         customerId,
         appId)
   }
@@ -134,7 +134,7 @@ export let generateSessionEvent = (scenario,
 let generateAPMEvent = (eventCreationTime,
   deviceInfo,
   clientSession,
-  appconnectId,
+  aid,
   customerId,
   appId) => {
 
@@ -145,7 +145,7 @@ let generateAPMEvent = (eventCreationTime,
     eventCreationTime,
     deviceInfo,
     clientSession,
-    appconnectId,
+    aid,
     customerId,
     appId)
 }
@@ -153,7 +153,7 @@ let generateAPMEvent = (eventCreationTime,
 let generateCommerceEvent = (eventCreationTime,
   deviceInfo,
   clientSession,
-  appconnectId,
+  aid,
   customerId,
   appId) => {
 
@@ -163,7 +163,7 @@ let generateCommerceEvent = (eventCreationTime,
     eventCreationTime,
     deviceInfo,
     clientSession,
-    appconnectId,
+    aid,
     customerId,
     appId)
 }
@@ -171,7 +171,7 @@ let generateCommerceEvent = (eventCreationTime,
 let generateCustomEvent = (eventCreationTime,
   deviceInfo,
   clientSession,
-  appconnectId,
+  aid,
   customerId,
   appId) => {
 
@@ -181,7 +181,7 @@ let generateCustomEvent = (eventCreationTime,
     eventCreationTime,
     deviceInfo,
     clientSession,
-    appconnectId,
+    aid,
     customerId,
     appId)
 
@@ -190,7 +190,7 @@ let generateCustomEvent = (eventCreationTime,
 let generateViewEvent = (eventCreationTime,
   deviceInfo,
   clientSession,
-  appconnectId,
+  aid,
   customerId,
   appId) => {
 
@@ -200,7 +200,7 @@ let generateViewEvent = (eventCreationTime,
     eventCreationTime,
     deviceInfo,
     clientSession,
-    appconnectId,
+    aid,
     customerId,
     appId)
 
@@ -209,7 +209,7 @@ let generateViewEvent = (eventCreationTime,
 let generatePushTokenEvent = (eventCreationTime,
   deviceInfo,
   clientSession,
-  appconnectId,
+  aid,
   customerId,
   appId) => {
   return generateEvent('device.update.pushToken', {
@@ -218,7 +218,7 @@ let generatePushTokenEvent = (eventCreationTime,
     eventCreationTime,
     deviceInfo,
     clientSession,
-    appconnectId,
+    aid,
     customerId,
     appId
   )
@@ -228,7 +228,7 @@ let generateUpdateUserEvent = (userInfo,
   eventCreationTime,
   deviceInfo,
   clientSession,
-  appconnectId,
+  aid,
   customerId,
   appId) => {
   return generateEvent('user.update',
@@ -243,7 +243,7 @@ let generateUpdateUserEvent = (userInfo,
     eventCreationTime,
     deviceInfo,
     clientSession,
-    appconnectId,
+    aid,
     customerId,
     appId
   )
@@ -252,7 +252,7 @@ let generateUpdateUserEvent = (userInfo,
 let generateRandomEvent = (eventCreationTime,
   deviceInfo,
   clientSession,
-  appconnectId,
+  aid,
   customerId,
   appId) => {
 
@@ -264,28 +264,28 @@ let generateRandomEvent = (eventCreationTime,
       return generateCommerceEvent(eventCreationTime,
         deviceInfo,
         clientSession,
-        appconnectId,
+        aid,
         customerId,
         appId)
     case EVENT_CATEGORY_VIEWS:
       return generateViewEvent(eventCreationTime,
         deviceInfo,
         clientSession,
-        appconnectId,
+        aid,
         customerId,
         appId)
     case EVENT_CATEGORY_VIEWS:
       return generateViewEvent(eventCreationTime,
         deviceInfo,
         clientSession,
-        appconnectId,
+        aid,
         customerId,
         appId)
     case EVENT_CATEGORY_APM:
       return generateAPMEvent(eventCreationTime,
         deviceInfo,
         clientSession,
-        appconnectId,
+        aid,
         customerId,
         appId)
     case EVENT_CATEGORY_CUSTOM:
@@ -293,7 +293,7 @@ let generateRandomEvent = (eventCreationTime,
       return generateCustomEvent(eventCreationTime,
         deviceInfo,
         clientSession,
-        appconnectId,
+        aid,
         customerId,
         appId)
 
@@ -306,14 +306,14 @@ let generateEvent = (eventName,
   eventCreationTime,
   deviceInfo,
   clientSession,
-  appconnectId,
+  aid,
   customerId,
   appId) => {
 
   return {
     eventId: uuid(),
     deviceId: deviceInfo["deviceId"],
-    appconnectId: appconnectId,
+    aid: aid,
     customerId: customerId,
     eventName: eventName,
     appId: appId,
