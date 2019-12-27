@@ -98,7 +98,7 @@ let generateAndSendEventsAndUsers = () => {
             let userInfo = UserGenerator.generate(appId)
 
             // new device based on user's last device id
-            let deviceInfo = DeviceGenerator.generate(userInfo["ldid"])
+            let deviceInfo = DeviceGenerator.generate(userInfo["ldid"])            
 
             // sessions
             for (var i = 0; i < setup.config.sessionsPerUser; i++) {
@@ -109,7 +109,7 @@ let generateAndSendEventsAndUsers = () => {
             }
 
             // send user
-            sendUser(userInfo)
+            sendUser(_.assignIn(userInfo, {"deviceProperty" : deviceInfo}))
 
         }
 
@@ -183,7 +183,7 @@ let createAndSendSessionEvents = (appId, userInfo, deviceInfo) => {
     }
 
     // fire clientSessionStop  
-    let sessionStoptime = getSessionStopTime(setup.config.mode == modes.GENERATE_AND_SEND_USERS ? 2 : setup.eventsPerSession, sessionStartTime)
+    let sessionStoptime = getSessionStopTime(setup.config.mode == modes.GENERATE_AND_SEND_USERS ? 2 : setup.config.eventsPerSession, sessionStartTime)
 
     _.assignIn(sessionInfo["clientSession"], {
         stopDateTime: sessionStoptime,
