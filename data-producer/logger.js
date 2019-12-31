@@ -1,5 +1,5 @@
 export let error = (err) => {
-    console.error(err)
+    console.error(`Error: ${err}`)
 }
 
 export let info = (msg) => {

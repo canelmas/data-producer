@@ -42,7 +42,7 @@ export let generate = (eventName,
   clientSession,
   aid,
   customerId,
-  appId) => {
+  appId) => {    
 
   return {
     eventId: uuid(),

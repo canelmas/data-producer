@@ -18,8 +18,11 @@ import {
     getSessionDuration,
     nextEventTime
 } from './util';
-import {
-    modes
+import {    
+    GENERATE_AND_SEND_EVENTS_WITH_USERS_READ_FROM_REDIS,
+    GENERATE_AND_WRITE_USERS_TO_REDIS,
+    GENERATE_AND_SEND_USERS,
+    SEND_USERS_ON_REDIS
 } from './modes'
 import WebHook from "./webhook";
 import outputs from './outputs';
@@ -43,10 +46,17 @@ let sendUsersOnRedis = () => {
 
 }
 
-let generateAndPersistUsersOntoRedis = () => {
+let generateAndPersistUsersOntoRedis = () => {    
 
     for (var k = 0; k < setup.config.numOfUsers; k++) {
-        let userInfo = UserGenerator.generate()
+    
+        // new user
+        let userInfo = UserGenerator.generate(setup.getRandomAppId())
+
+        // new device based on user's last device id
+        let deviceInfo = DeviceGenerator.generate(userInfo["ldid"])     
+
+        userInfo = _.assignIn(userInfo, {deviceProperty : deviceInfo})        
 
         if (setup.isProd()) {
             Redis.set(userInfo["aid"], JSON.stringify(userInfo), Redis.print)
@@ -67,15 +77,16 @@ let readUsersFromRedisAndSendEvents = () => {
 
             Redis.getRandomValue((userInfo) => {
 
-                let jsonUser = JSON.parse(userInfo)
+                let jsonUser = JSON.parse(userInfo)        
+                console.log(jsonUser)                                
 
                 // create new device based on user's last device id
-                let deviceInfo = DeviceGenerator.generate(jsonUser["ldid"])
-
+                let deviceInfo = jsonUser.deviceProperty                
+                
                 // create user sessions
                 for (var i = 0; i < setup.config.sessionsPerUser; i++) {
                     // create session events
-                    createAndSendSessionEvents(jsonUser, deviceInfo)
+                    createAndSendSessionEvents(jsonUser.appId, jsonUser, deviceInfo)
                 }
 
             }, (err) => {
@@ -152,8 +163,7 @@ let createAndSendSessionEvents = (appId, userInfo, deviceInfo) => {
             sendEvent(e)
         })
 
-
-    } else if (setup.config.mode == modes.GENERATE_AND_SEND_USERS) {
+    } else if (setup.config.mode == GENERATE_AND_SEND_USERS) {
 
         let eventCreationTime = nextEventTime(sessionStartTime)
 
@@ -183,7 +193,7 @@ let createAndSendSessionEvents = (appId, userInfo, deviceInfo) => {
     }
 
     // fire clientSessionStop  
-    let sessionStoptime = getSessionStopTime(setup.config.mode == modes.GENERATE_AND_SEND_USERS ? 2 : setup.config.eventsPerSession, sessionStartTime)
+    let sessionStoptime = getSessionStopTime(setup.config.mode == GENERATE_AND_SEND_USERS ? 2 : setup.config.eventsPerSession, sessionStartTime)
 
     _.assignIn(sessionInfo["clientSession"], {
         stopDateTime: sessionStoptime,
@@ -271,19 +281,19 @@ let sendEvent = async (event) => {
 export default () => {
 
     switch (setup.config.mode) {
-        case modes.SEND_USERS_ON_REDIS:
+        case SEND_USERS_ON_REDIS:
             sendUsersOnRedis()
             break;
-        case modes.GENERATE_AND_WRITE_USERS_TO_REDIS:
+        case GENERATE_AND_WRITE_USERS_TO_REDIS:
             generateAndPersistUsersOntoRedis()
             break;
-        case modes.GENERATE_AND_SEND_EVENTS_WITH_USERS_READ_FROM_REDIS:
+        case GENERATE_AND_SEND_EVENTS_WITH_USERS_READ_FROM_REDIS:            
             readUsersFromRedisAndSendEvents()
             break;
-        case modes.GENERATE_AND_SEND_USERS:
+        case GENERATE_AND_SEND_USERS:
             generateAndSendUsers()
             break;
-        default:
+        default:    // GENERATE_AND_SEND_EVENTS_AND_USERS
             generateAndSendEventsAndUsers()
 
     }
