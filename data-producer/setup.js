@@ -1,6 +1,6 @@
 import _ from 'lodash'
 import {
-    modes,
+    GENERATE_AND_SEND_EVENTS_AND_USERS,
     setMode,
 } from "./modes"
 import Funnel from "./funnel";
@@ -43,7 +43,7 @@ const config = {
     sessionsPerUser: process.env.SESSIONS_PER_USER || 1,
     eventsPerSession: process.env.EVENTS_PER_SESSION || 5,
     excludeSessionEvents: process.env.EXCLUDE_SESSION_EVENTS ? process.env.EXCLUDE_SESSION_EVENTS == 'true' : false,
-    mode: setMode(process.env.MODE) || modes.GENERATE_AND_SEND_EVENTS_AND_USERS,    
+    mode: setMode(process.env.MODE) || GENERATE_AND_SEND_EVENTS_AND_USERS,    
     apps : parse(process.env.APP_IDS) || ['DemoApp'],
     deviceId : process.env.DEVICE_ID || undefined,
     topicsToCreate: process.env.CREATE_TOPICS || undefined,
