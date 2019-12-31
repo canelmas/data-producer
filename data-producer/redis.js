@@ -21,17 +21,27 @@ let init = async (onRedisReady) => {
     })
 }
 
-let get = (key, onSuccess, onError) => {
+let get = (key, cb) => {
+    
+    if (client == null){
+        throw new Error("Redis not initialized!")        
+    }
+
     client.get(key, (err, result) => {
         if (result) {
-            onSuccess(result)
+            cb(null, result)            
         } else {
-            onError(err)
+            cb(err)            
         }
     })
 }
 
 let set = (key, val, onSuccess) => {
+
+    if (client == null){
+        throw new Error("Redis not initialized!")        
+    }
+
     client.set(key, val, onSuccess)
 }
 
@@ -39,18 +49,18 @@ let print = () => {
     client.print
 }
 
-let getRandomValue = (onSuccess, onError) => {
+let getRandomValue = (onSuccess, onError) => {    
 
-    client.send_command("RANDOMKEY", (err, key) => {
-        if (key) {
+    client.send_command("RANDOMKEY", (err, key) => {        
+        if (key) {                    
             get(key, (err, result) => {
-                if (result) {
+                if (result) {                    
                     onSuccess(result)
-                } else {
+                } else {                    
                     onError(err)
                 }
             })
-        } else {
+        } else {            
             onError(err)
         }
     })
