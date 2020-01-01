@@ -12,6 +12,7 @@ docker run --name=data-producer -d --restart=always \
         -e SESSION_PER_USER=5 \
         -e EVENTS_PER_SESSION=20 \
         -e APP_IDS="LovelyApp,LoveliestApp,HappyApp,HappiestApp" \
+        -e EVENT_DATE_RANGE="1D"
         -e SEND_USERS="true" \
         -e ADD_USER_DEMOGRAPHICS="false" \
         -e DATE_FORMAT="YYYY-MM-DDTHH:mm:ssZ" \
@@ -294,3 +295,11 @@ Below is a sample template:
 ```
 
 Default is __undefined__.
+
+### `EVENT_DATE_RANGE`
+
+Amount of time to substract from now() while generating event times e.g. setting this value to `15D` will ensure that event time is randomly selected starting from 15 days ago.
+
+`M`, `D` and `Y` are supported.
+
+Default is __1M__.

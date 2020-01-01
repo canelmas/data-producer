@@ -34,6 +34,24 @@ let hasOutput = (output) => {
     return config.output.includes(output)
 }
 
+let dateRangeVal = (paramVal) => {
+    let val = parseInt(paramVal.substring(0, paramVal.length -1))
+    return isNaN(val) ? 1 : val     
+}
+
+let dateRangeUnit = (paramVal)=> {    
+    let unit = paramVal.slice(-1)
+    switch (unit) {        
+        case "Y":
+            return "years"
+        case "D":
+            return "days"        
+        case "M":
+        default :
+            return "months"
+    }
+}
+
 const config = {
     env: process.env.ENV || "production",
     output: parse(process.env.OUTPUT) || ['console'],
@@ -61,7 +79,9 @@ const config = {
     webhookUrl : process.env.WEBHOOK_URL || undefined,
     webhookHeaders : process.env.WEBHOOK_HEADERS || undefined,
     sendUsers : process.env.SEND_USERS ? process.env.SEND_USERS === 'true' : true,
-    funnel : process.env.FUNNEL_TEMPLATE ? Funnel.create(process.env.FUNNEL_TEMPLATE) : undefined
+    funnel : process.env.FUNNEL_TEMPLATE ? Funnel.create(process.env.FUNNEL_TEMPLATE) : undefined,
+    dateRangeVal : process.env.EVENT_DATE_RANGE ? dateRangeVal(process.env.EVENT_DATE_RANGE) : 1,
+    dateRangeUnit : process.env.EVENT_DATE_RANGE ? dateRangeUnit(process.env.EVENT_DATE_RANGE) : "months"
 }
 
 let print = () => {
@@ -75,6 +95,8 @@ let print = () => {
     info(`sessionsPerUser=${config.sessionsPerUser}`)
     info(`eventsPerSession=${config.eventsPerSession}`)
     info(`excludeSessionEvents=${config.excludeSessionEvents}`)   
+    info(`dateRangeVal=${config.dateRangeVal}`)
+    info(`dateRangeUnit=${config.dateRangeUnit}`)   
     info(`sendUsers=${config.sendUsers}`)    
     info(`addUserDemographics=${config.addUserDemographics}`)
     info(`dateFormat=${config.dateFormat}`)
