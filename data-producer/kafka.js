@@ -225,7 +225,9 @@ let sendToSingleTopicAsAvro = async (topic, message, subject) => {
                 info(res)
             }
         })
-        .catch(error)
+        .catch(err => {            
+            error(`Failed for ${JSON.stringify(message)}\n${err}`)
+        })
 }
 
 let sendToSingleTopicAsJson = async (topic, message) => {

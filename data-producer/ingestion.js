@@ -73,18 +73,18 @@ let readUsersFromRedisAndSendEvents = () => {
 
     setInterval(() => {
 
-        for (var k = 0; k < setup.config.numOfUsers; k++) {
-
+        for (var k = 0; k < setup.config.numOfUsers; k++) {            
+            
             Redis.getRandomValue((userInfo) => {
 
-                let jsonUser = JSON.parse(userInfo)        
-                console.log(jsonUser)                                
+                let jsonUser = JSON.parse(userInfo)                                                   
 
                 // create new device based on user's last device id
                 let deviceInfo = jsonUser.deviceProperty                
                 
                 // create user sessions
                 for (var i = 0; i < setup.config.sessionsPerUser; i++) {
+
                     // create session events
                     createAndSendSessionEvents(jsonUser.appId, jsonUser, deviceInfo)
                 }
@@ -92,6 +92,7 @@ let readUsersFromRedisAndSendEvents = () => {
             }, (err) => {
                 error(err)
             })
+            
         }
 
     }, setup.config.period)
