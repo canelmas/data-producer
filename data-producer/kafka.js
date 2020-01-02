@@ -21,7 +21,7 @@ let producers = {}
 let multiTopicMapping = []
 
 let isAvroRequired = () => {
-    return true
+    return true // todo : fix it. Currently we're assuming write_to_multi_topics => one of the topics is avro
 }
 
 let onError = async (err) => {    
@@ -50,6 +50,10 @@ let initProducer = async (onReady) => {
             }
 
             if (isAvroRequired()) {
+
+                if (!setup.config.schemaRegistry) {
+                    throw new Error("Schema Registry is missing!")
+                }
 
                 kafka = new KafkaAvro(config.brokerOptions)
                 let avroProducer = kafka.avro.producer(config.producerOptions)
@@ -252,7 +256,7 @@ let sendEvent = async (event) => {
     send(config.topicOptions.events, event, ENTITY_EVENT)
 }
 
-let sendUser = async (user) => {
+let sendUser = async (user) => {    
     send(config.topicOptions.users, user, ENTITY_USER)
 }
 
