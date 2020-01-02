@@ -134,7 +134,7 @@ let generateEvent = () => {
       return render(event, generateProduct())
 
     default:
-      return render(event)
+      return render(event, null)
   }
 }
 
