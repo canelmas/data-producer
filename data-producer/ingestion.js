@@ -34,10 +34,12 @@ let sendUsersOnRedis = () => {
 
     Redis.scan(cursor, (key) => {
 
-        Redis.get(key, (result) => {
-            sendUser(JSON.parse(result))
-        }, (err) => {
-            error(err)
+        Redis.get(key, (err, result) => {
+            if (err) {
+                error(err)
+            } else {
+                sendUser(JSON.parse(result))                
+            }            
         })
 
     }, () => {

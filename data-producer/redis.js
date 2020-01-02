@@ -27,7 +27,7 @@ let get = (key, cb) => {
         throw new Error("Redis not initialized!")        
     }
 
-    client.get(key, (err, result) => {
+    client.get(key, (err, result) => {        
         if (result) {
             cb(null, result)            
         } else {
