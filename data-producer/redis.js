@@ -89,7 +89,7 @@ let scan = (cursor, callback, finalize) => {
 
             if (cursor == 0) {
                 return finalize()
-            } else return scanRedis(cursor, callback, finalize)
+            } else return scan(cursor, callback, finalize)
 
         }
 
