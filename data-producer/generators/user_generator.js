@@ -36,9 +36,8 @@ let generateUser = (deviceId, appId) => {
       deviceId,
       uuid()
     ],
-    createdAt: moment(faker.date.past()).format(setup.config.dateFormat),
-    lastSeenAt: moment(faker.date.recent()).format(setup.config.dateFormat),
-    lastModifiedAt: moment(faker.date.recent()).format(setup.config.dateFormat),
+    fsa: moment(faker.date.past()).format(setup.config.dateFormat),
+    lsa: moment(faker.date.recent()).format(setup.config.dateFormat),    
     dob: moment(faker.date.past(_.sample([20, 25, 30, 35, 40, 45, 50, 55, 60]))).format("YYYY-MM-DD"),
     phone: faker.phone.phoneNumber(),
     gn: _.sample(["male", "female", "other"]),
@@ -47,6 +46,11 @@ let generateUser = (deviceId, appId) => {
     email: faker.internet.email(),
     fn: faker.name.firstName(),
     ln: faker.name.lastName(),
+    deviceSettings : {
+      notification: {
+        enabled: Boolean(_.sample([true, false]))
+      }
+    }
   }
 
   if (setup.config.addUserDemographics) {
