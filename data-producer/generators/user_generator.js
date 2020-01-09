@@ -25,7 +25,22 @@ let generate = (appId) => {
 
 }
 
+let generateNonAnonymousData = () => {
+  return {
+    dob: moment(faker.date.past(_.sample([20, 25, 30, 35, 40, 45, 50, 55, 60]))).format("YYYY-MM-DD"),
+    phone: faker.phone.phoneNumber(),
+    gn: _.sample(["male", "female", "other"]),
+    cid: uuid(),
+    nid: faker.finance.iban(),
+    email: faker.internet.email(),
+    fn: faker.name.firstName(),
+    ln: faker.name.lastName(),
+  }
+}
+
 let generateUser = (deviceId, appId) => {
+
+  let isAnonymous = Boolean(_.sample([true, false]))
 
   let user = {
     clientCreationDate: newEventTime(),
@@ -37,15 +52,7 @@ let generateUser = (deviceId, appId) => {
       uuid()
     ],
     fsa: moment(faker.date.past()).format(setup.config.dateFormat),
-    lsa: moment(faker.date.recent()).format(setup.config.dateFormat),    
-    dob: moment(faker.date.past(_.sample([20, 25, 30, 35, 40, 45, 50, 55, 60]))).format("YYYY-MM-DD"),
-    phone: faker.phone.phoneNumber(),
-    gn: _.sample(["male", "female", "other"]),
-    cid: uuid(),
-    nid: faker.finance.iban(),
-    email: faker.internet.email(),
-    fn: faker.name.firstName(),
-    ln: faker.name.lastName(),
+    lsa: moment(faker.date.recent()).format(setup.config.dateFormat),
     deviceSettings : {
       notification: {
         enabled: Boolean(_.sample([true, false]))
@@ -53,11 +60,17 @@ let generateUser = (deviceId, appId) => {
     }
   }
 
-  if (setup.config.addUserDemographics) {
-    user = _.assign(user, {
-      data: generateDemographics()
-    })
-  }
+  if (!isAnonymous) {
+    
+    user = _.assign(user, generateNonAnonymousData())
+
+    if (setup.config.addUserDemographics) {
+      user = _.assign(user, {
+        data: generateDemographics()
+      })
+    }
+
+  }  
 
   return user
 
