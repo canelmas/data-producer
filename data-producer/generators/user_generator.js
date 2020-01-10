@@ -29,7 +29,7 @@ let generateNonAnonymousData = () => {
   return {
     dob: moment(faker.date.past(_.sample([20, 25, 30, 35, 40, 45, 50, 55, 60]))).format("YYYY-MM-DD"),
     phone: faker.phone.phoneNumber(),
-    gn: _.sample(["male", "female", "other"]),
+    gn : _.sample(["MALE", "FEMALE", "NON_BINARY", "UNKNOWN"]),
     cid: uuid(),
     nid: faker.finance.iban(),
     email: faker.internet.email(),
