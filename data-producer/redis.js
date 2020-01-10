@@ -52,16 +52,16 @@ let print = () => {
 let getRandomValue = (onSuccess, onError) => {    
 
     client.send_command("RANDOMKEY", (err, key) => {        
-        if (key) {                    
+        if (key) {                            
             get(key, (err, result) => {
                 if (result) {                    
                     onSuccess(result)
-                } else {                    
-                    onError(err)
+                } else {                                        
+                    onError(`Getting random redis value with key [${key}] failed!`)
                 }
             })
-        } else {            
-            onError(err)
+        } else {                 
+            onError(`Getting random redis value failed!`)
         }
     })
 

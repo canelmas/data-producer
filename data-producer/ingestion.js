@@ -79,7 +79,7 @@ let readUsersFromRedisAndSendEvents = () => {
             
             Redis.getRandomValue((userInfo) => {
 
-                let jsonUser = JSON.parse(userInfo)                                                   
+                let jsonUser = JSON.parse(userInfo)                                                                
 
                 // create new device based on user's last device id
                 let deviceInfo = jsonUser.deviceProperty                
@@ -91,7 +91,7 @@ let readUsersFromRedisAndSendEvents = () => {
                     createAndSendSessionEvents(jsonUser.appId, jsonUser, deviceInfo)
                 }
 
-            }, (err) => {
+            }, (err) => {        
                 error(err)
             })
             
