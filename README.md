@@ -303,3 +303,11 @@ Amount of time to substract from now() while generating event times e.g. setting
 `M`, `D` and `Y` are supported.
 
 Default is __1M__.
+
+### `EVENT_DATE`
+
+A specific date to use while generating events.
+
+Expected format is `YYYY-MM-DD`.
+
+Default is __undefined__

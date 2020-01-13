@@ -6,7 +6,10 @@ import setup from './setup'
 const secondsBetweenEvents = _.sample(_.range(2, 30))
 
 let newEventTime = () => {
-  return moment(faker.date.between(moment().subtract(setup.config.dateRangeVal, setup.config.dateRangeUnit), moment())).format(setup.config.dateFormat)
+  return setup.config.eventDate ?
+    moment(setup.config.eventDate).format(setup.config.dateFormat) :
+    moment(faker.date.between(moment().subtract(setup.config.dateRangeVal, setup.config.dateRangeUnit), moment())).format(setup.config.dateFormat)
+
 }
 
 let nextEventTime = (lastEventTime) => {
@@ -25,5 +28,5 @@ export {
   newEventTime,
   nextEventTime,
   getSessionStopTime,
-  getSessionDuration  
+  getSessionDuration
 }

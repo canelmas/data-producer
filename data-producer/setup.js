@@ -80,6 +80,7 @@ const config = {
     webhookHeaders : process.env.WEBHOOK_HEADERS || undefined,
     sendUsers : process.env.SEND_USERS ? process.env.SEND_USERS === 'true' : true,
     funnel : process.env.FUNNEL_TEMPLATE ? Funnel.create(process.env.FUNNEL_TEMPLATE) : undefined,
+    eventDate: process.env.EVENT_DATE || undefined,    
     dateRangeVal : process.env.EVENT_DATE_RANGE ? dateRangeVal(process.env.EVENT_DATE_RANGE) : 1,
     dateRangeUnit : process.env.EVENT_DATE_RANGE ? dateRangeUnit(process.env.EVENT_DATE_RANGE) : "months"
 }
@@ -95,6 +96,7 @@ let print = () => {
     info(`sessionsPerUser=${config.sessionsPerUser}`)
     info(`eventsPerSession=${config.eventsPerSession}`)
     info(`excludeSessionEvents=${config.excludeSessionEvents}`)   
+    info(`eventDate=${config.eventDate}`)
     info(`dateRangeVal=${config.dateRangeVal}`)
     info(`dateRangeUnit=${config.dateRangeUnit}`)   
     info(`sendUsers=${config.sendUsers}`)    
