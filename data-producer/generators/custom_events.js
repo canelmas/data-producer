@@ -3,7 +3,8 @@ import faker from 'faker';
 
 const customerTypes = ["Bireysel", "Ticari"]
 
-const welcomeScreens = ['wanda',
+const welcomeScreens = [
+  'wanda',
   'anika',
   'geovanny',
   'dashawn',
@@ -15,7 +16,8 @@ const welcomeScreens = ['wanda',
   'alivia'
 ]
 
-const campaigns = ['gayle',
+const campaigns = [
+  'gayle',
   'steve',
   'skye',
   'valerie',
@@ -37,7 +39,8 @@ const campaigns = ['gayle',
   'allene'
 ]
 
-const shortcuts = ['mabel',
+const shortcuts = [
+  'mabel',
   'pierce',
   'tobin',
   'malinda',
@@ -59,7 +62,8 @@ const shortcuts = ['mabel',
   'gilberto'
 ]
 
-const menuTitles = ['mabelle',
+const menuTitles = [
+  'mabelle',
   'ken',
   'thad',
   'dulce',
@@ -111,7 +115,8 @@ const menuTitles = ['mabelle',
   'jaclyn'
 ]
 
-const dashboardTabs = ['clara',
+const dashboardTabs = [
+  'clara',
   'kellen',
   'emelia',
   'eduardo',
@@ -163,11 +168,24 @@ const dashboardTabs = ['clara',
   'gonzalo'
 ]
 
+const randomKeys = [
+  'eos', 
+  'quia', 
+  'saepe', 
+  'unde', 
+  'voluptates',
+  'merl',
+  'jed',
+  'mason',
+  'vernie',
+  'lance'
+]
+
 let generateRandomAttributes = (event) => {
 
-  if (_.has(attributes, event)) {
+  if (_.has(attributes, event)) { // todo : this may be unnecessary
 
-    switch (event) { // smells really bad
+    switch (event) { // smells
       case "shortcut_added":
       case "shortcut_pressed":
       case "shortcut_deleted":
@@ -195,49 +213,78 @@ let generateRandomAttributes = (event) => {
 }
 
 let getRandomAttributes = () => {
-  return {
-    kullaniciTipi: _.sample(customerTypes),
-    other1: faker.internet.domainWord(),
-    other2: faker.internet.domainWord(),
-    other3: faker.internet.domainWord(),
-    other4: faker.internet.domainWord()
-  }
+  return addRandomAdditionalAttributes(
+    {
+      kullaniciTipi: _.sample(customerTypes),
+      other1: faker.internet.domainWord(),
+      other2: faker.internet.domainWord(),
+      other3: faker.internet.domainWord(),
+      other4: faker.internet.domainWord()
+    }
+  )
 }
 
-let getCampaignAttributes = () => {
-  return {
+let addRandomAdditionalAttributes = (attrs) => {
+  _.times(_.random(0,3), () => {
+    attrs[getRandomKey()] = getRandomPrimitiveArray()
+  })   
+  return attrs   
+}
+
+let getRandomKey = () => {
+  return _.sample(randomKeys)
+}
+
+let getRandomPrimitive = (type) => {
+  let typeMap = {
+    1: faker.random.number(),
+    2: faker.random.word(),
+    3: faker.random.boolean()
+  }
+  return typeMap[type]
+}
+
+let getRandomPrimitiveArray = () => {
+  let type = _.sample([1,2,3])
+  return _.times(_.random(1,5), () => {
+    return getRandomPrimitive(type)        
+  })
+}
+
+let getCampaignAttributes = () => {  
+  return addRandomAdditionalAttributes({
     kampanyaAdi: _.sample(campaigns),
     kullaniciTipi: _.sample(customerTypes)
-  }
+  })
 }
 
-let getWelcomeScreenAttributes = () => {
-  return {
+let getWelcomeScreenAttributes = () => {  
+  return addRandomAdditionalAttributes({
     ekranAdi: _.sample(welcomeScreens),
     kullaniciTipi: _.sample(customerTypes)
-  }
+  })
 }
 
-let getShortcutAttributes = () => {
-  return {
+let getShortcutAttributes = () => {  
+  return addRandomAdditionalAttributes({
     kisayolAdi: _.sample(shortcuts),
-    kullaniciTipi: _.sample(customerTypes)
-  }
+    kullaniciTipi: _.sample(customerTypes)    
+  })  
 }
 
-let getDashboardTabAttributes = () => {
-  return {
+let getDashboardTabAttributes = () => {  
+  return addRandomAdditionalAttributes({
     dashboardTabi: _.sample(dashboardTabs),
     kullaniciTipi: _.sample(customerTypes)
-  }
+  })  
 }
 
-let getMenuItemAttributes = () => {
-  return {
+let getMenuItemAttributes = () => {  
+  return addRandomAdditionalAttributes({
     menuAdi: _.sample(menuTitles),
     ustMenu: _.sample(menuTitles),
     kullaniciTipi: _.sample(customerTypes)
-  }
+  })
 }
 
 const attributes = {
