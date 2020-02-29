@@ -6,9 +6,7 @@ let generate = () => {
   return {
     clientSession: {
       sessionId: uuid(),
-      startDateTime: newEventTime(),
-      stopDateTime : null,
-      duration : null
+      startDateTime: newEventTime()      
     }
   } 
 }

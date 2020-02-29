@@ -194,7 +194,7 @@ let generateViewEvent = (eventCreationTime,
   customerId,
   appId) => {
 
-  let event = ViewEvents.takeOne()
+  let event = ViewEvents.takeOne(eventCreationTime)
   return generateEvent(event["name"],
     event["attrs"],
     eventCreationTime,

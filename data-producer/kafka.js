@@ -235,9 +235,10 @@ let sendToSingleTopicAsAvro = async (topic, message, subject) => {
 }
 
 let sendToSingleTopicAsJson = async (topic, message) => {
+        
     await producers.json.send({
             topic: topic,
-            messages: [{
+            messages: [{                
                 value: JSON.stringify(message)
             }],
             acks: config.producerProperties.acks,

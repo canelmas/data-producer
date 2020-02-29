@@ -20,8 +20,8 @@ let getSessionStopTime = (eventsPerSession, sessionStartTime) => {
   return moment(sessionStartTime, setup.config.dateFormat).add(secondsBetweenEvents * (eventsPerSession + 1), "seconds").format(setup.config.dateFormat)
 }
 
-let getSessionDuration = (sessionStartTime, sessionStopTime) => {
-  return moment(sessionStopTime, setup.config.dateFormat).valueOf() - moment(sessionStartTime, setup.config.dateFormat).valueOf()
+let getSessionDuration = (sessionStartTime, sessionStopTime) => {  
+  return moment.duration(moment(sessionStopTime, setup.config.dateFormat).diff(moment(sessionStartTime, setup.config.dateFormat))).asMilliseconds()  
 }
 
 export {

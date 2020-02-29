@@ -196,12 +196,12 @@ let createAndSendSessionEvents = (appId, userInfo, deviceInfo) => {
     }
 
     // fire clientSessionStop  
-    let sessionStoptime = getSessionStopTime(setup.config.mode == GENERATE_AND_SEND_USERS ? 2 : setup.config.eventsPerSession, sessionStartTime)
+    let sessionStoptime = getSessionStopTime(setup.config.mode == GENERATE_AND_SEND_USERS ? 2 : setup.config.eventsPerSession, sessionStartTime)    
 
-    let sessionInfoWithDuration = _.assign({
+    let sessionInfoWithDuration = _.extend({
         stopDateTime: sessionStoptime,
         duration: getSessionDuration(sessionStartTime, sessionStoptime)
-    }, sessionInfo["clientSession"])
+    }, sessionInfo["clientSession"])       
 
     if (!setup.config.excludeSessionEvents) {
         sendEvent(
