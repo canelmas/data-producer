@@ -21,14 +21,15 @@ docker run --name=data-producer -d --restart=always \
         -e BROKERS=broker1:9092,broker2:19092,broker3:29092 \
         -e CREATE_TOPICS="events:1:1,users:1:1" \
         -e TOPIC_USERS=users \
-        -e TOPIC_EVENTS=events \
+        -e TOPIC_EVENTS=events \        
         -e FORMAT=avro \
         -e WRITE_TO_MULTI_TOPICS="event:events-json:json,event:events-avro:avro:events-avro-value" \
         -e SCHEMA_REGISTRY=http://schema-registry:8081 \
+        -e MESSAGE_KEY="appId"
         -e WEBHOOK_URL=http://localhost:3000/v1/events \
         -e WEBHOOK_HEADERS='x-api-key:f33be30e-7695-4817-9f0c-03cb567c5732,lovely-header:value'
         -e FUNNEL_TEMPLATE="{\"steps\":[{\"name\":\"A\",\"attributes\":{\"a_key_1\":\"word\",\"a_key_2\":\"number\"},\"probability\":0.6},{\"name\":\"B\",\"attributes\":{\"b_key_1\":\"amount\",\"b_key_2\":\"uuid\"},\"probability\":0.5},{\"name\":\"C\",\"probability\":0.9,\"attributes\":{\"c_key_1\":\"boolean\"}}]}" \         
-        canelmas/data-producer:4.4.4
+        canelmas/data-producer:4.5.0
 ```
 Images are available on [DockerHub](https://hub.docker.com/r/canelmas/data-producer).
 
@@ -310,4 +311,12 @@ A specific date to use while generating events.
 
 Expected format is `YYYY-MM-DD`.
 
-Default is __undefined__
+Default is __undefined__.
+
+### `MESSAGE_KEY`
+
+Kafka message key.
+
+`aid`, `deviceId`, `eventId`, `appId` and `eventName` are supported.
+
+Default is __null__.
