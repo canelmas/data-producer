@@ -181,18 +181,20 @@ let createMultiTopicMapping = () => {
     }
 }
 
-let send = async (topic, message, entity) => {
+let send = async (topic, messageValue, entity) => {
+
+    let messageKey = getKafkaMessageKey(setup.config.messageKey, messageValue)
 
     if (setup.isProd()) {
 
         if (setup.config.multiTopics) {
-            sendToMultipleTopics(message, entity)
+            sendToMultipleTopics(messageKey, messageValue, entity)
         } else {
-            sendToSingleTopic(topic, message)
+            sendToSingleTopic(topic, messageKey, messageValue)
         }
 
     } else {
-        prettyPrint(message)
+        prettyPrint(messageKey, messageValue)
     }
 
 }
@@ -211,17 +213,22 @@ let sendToMultipleTopics = async (message, entity) => {
 
 }
 
-let sendToSingleTopic = async (topic, message) => {
-    setup.config.format == 'avro' ? sendToSingleTopicAsAvro(topic, message) : sendToSingleTopicAsJson(topic, message)
+let sendToSingleTopic = async (topic, messageKey, messageValue) => {
+    setup.config.format == 'avro' ? sendToSingleTopicAsAvro(topic, messageKey, messageValue) : sendToSingleTopicAsJson(topic, messageKey, messageValue)
 }
 
-let sendToSingleTopicAsAvro = async (topic, message, subject) => {
+let getKafkaMessageKey = (key, message) => {        
+    return _.indexOf(['aid', 'deviceId', 'eventId', 'appId', 'eventName'], key) != -1 ? _.get(message, key) : null
+}
+
+let sendToSingleTopicAsAvro = async (topic, messageKey, messageValue, subject) => {
     await producers.avro.send({
             topic: topic,
             messages: [{
                 subject: subject || `${topic}-value`,
                 version: "latest",
-                value: message
+                key : messageKey,
+                value: messageValue
             }]
         })
         .then(res => {
@@ -230,16 +237,16 @@ let sendToSingleTopicAsAvro = async (topic, message, subject) => {
             }
         })
         .catch(err => {            
-            error(`Failed for ${JSON.stringify(message)}\n${err}`)
+            error(`Failed for ${JSON.stringify(messageValue)}\n${err}`)
         })
 }
 
-let sendToSingleTopicAsJson = async (topic, message) => {
-        
+let sendToSingleTopicAsJson = async (topic, messageKey, messageValue) => {        
     await producers.json.send({
             topic: topic,
             messages: [{                
-                value: JSON.stringify(message)
+                key : messageKey,
+                value: JSON.stringify(messageValue)
             }],
             acks: config.producerProperties.acks,
             timeout: config.producerProperties.timeout,
@@ -250,7 +257,9 @@ let sendToSingleTopicAsJson = async (topic, message) => {
                 info(res)
             }
         })
-        .catch(error)
+        .catch(err => {            
+            error(`Failed for ${JSON.stringify(messageValue)}\n${err}`)
+        })
 }
 
 let sendEvent = async (event) => {

@@ -6,6 +6,9 @@ export let info = (msg) => {
     console.info(msg)
 }
 
-export let prettyPrint = (json) => {
-    info(JSON.stringify(json, null, 4))
+export let prettyPrint = (key, value) => {    
+    info({
+        key: key,
+        value: JSON.stringify(value)        
+    })    
 }

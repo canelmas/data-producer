@@ -82,7 +82,8 @@ const config = {
     funnel : process.env.FUNNEL_TEMPLATE ? Funnel.create(process.env.FUNNEL_TEMPLATE) : undefined,
     eventDate: process.env.EVENT_DATE || undefined,    
     dateRangeVal : process.env.EVENT_DATE_RANGE ? dateRangeVal(process.env.EVENT_DATE_RANGE) : 1,
-    dateRangeUnit : process.env.EVENT_DATE_RANGE ? dateRangeUnit(process.env.EVENT_DATE_RANGE) : "months"
+    dateRangeUnit : process.env.EVENT_DATE_RANGE ? dateRangeUnit(process.env.EVENT_DATE_RANGE) : "months",
+    messageKey : process.env.MESSAGE_KEY || null
 }
 
 let print = () => {
@@ -113,9 +114,10 @@ let print = () => {
     info(`topicUsers=${config.topicUsers}`)
     info(`multiTopics=${config.multiTopics}`)
     info(`schemaRegistry=${config.schemaRegistry}`)
+    info(`messageKey=${config.messageKey}`)
     info(`webhookUrl=${config.webhookUrl}`)
     info(`webhookHeaders=${config.webhookHeaders}`)
-    info(`funnel=${JSON.stringify(config.funnel)}`)
+    info(`funnel=${JSON.stringify(config.funnel)}`)    
 }
 
 export default {
