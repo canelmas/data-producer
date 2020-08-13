@@ -21,13 +21,17 @@ let isProd = () => {
     return config.env == "production"
 }
 
-let parse = (data) => {
+let commaSeparatedValuesToArray = (data) => {
 
     if (!data) {
         return undefined
     }
 
     return _.split(data.replace(/\s/g, ""), ",") 
+}
+
+let shouldExplode = () => {    
+    return config.explode == 'true'
 }
 
 let hasOutput = (output) => {
@@ -54,7 +58,7 @@ let dateRangeUnit = (paramVal)=> {
 
 const config = {
     env: process.env.ENV || "production",
-    output: parse(process.env.OUTPUT) || ['console'],
+    output: commaSeparatedValuesToArray(process.env.OUTPUT) || ['console'],
     verbose: process.env.VERBOSE || "false",
     period: process.env.PERIOD_IN_MS || 5 * 1000,
     numOfUsers: process.env.NUM_OF_USERS || 1,
@@ -62,7 +66,7 @@ const config = {
     eventsPerSession: process.env.EVENTS_PER_SESSION || 5,
     excludeSessionEvents: process.env.EXCLUDE_SESSION_EVENTS ? process.env.EXCLUDE_SESSION_EVENTS == 'true' : false,
     mode: setMode(process.env.MODE) || GENERATE_AND_SEND_EVENTS_AND_USERS,    
-    apps : parse(process.env.APP_IDS) || ['DemoApp'],
+    apps : commaSeparatedValuesToArray(process.env.APP_IDS) || ['DemoApp'],
     deviceId : process.env.DEVICE_ID || undefined,
     topicsToCreate: process.env.CREATE_TOPICS || undefined,
     scenario: process.env.EVENT_SCENARIO || "random",
@@ -72,7 +76,7 @@ const config = {
     addUserDemographics: process.env.ADD_USER_DEMOGRAPHICS || "false",
     topicUsers: process.env.TOPIC_USERS || "users",
     topicEvents: process.env.TOPIC_EVENTS || "events",
-    brokers: parse(process.env.BROKERS) || ["localhost:19092"],
+    brokers: commaSeparatedValuesToArray(process.env.BROKERS) || ["localhost:19092"],
     multiTopics : process.env.WRITE_TO_MULTI_TOPICS || undefined,
     redisHost : process.env.REDIS_HOST || undefined,
     redisPort : process.env.REDIS_PORT || undefined,
@@ -83,7 +87,8 @@ const config = {
     eventDate: process.env.EVENT_DATE || undefined,    
     dateRangeVal : process.env.EVENT_DATE_RANGE ? dateRangeVal(process.env.EVENT_DATE_RANGE) : 1,
     dateRangeUnit : process.env.EVENT_DATE_RANGE ? dateRangeUnit(process.env.EVENT_DATE_RANGE) : "months",
-    messageKey : process.env.MESSAGE_KEY || null
+    messageKey : process.env.MESSAGE_KEY || null,    
+    explode : process.env.EXPLODE || "false",
 }
 
 let print = () => {
@@ -117,7 +122,8 @@ let print = () => {
     info(`messageKey=${config.messageKey}`)
     info(`webhookUrl=${config.webhookUrl}`)
     info(`webhookHeaders=${config.webhookHeaders}`)
-    info(`funnel=${JSON.stringify(config.funnel)}`)    
+    info(`funnel=${JSON.stringify(config.funnel)}`)
+    info(`explode=${config.explode}`)
 }
 
 export default {
@@ -126,5 +132,6 @@ export default {
     isProd,
     isVerbose,
     getRandomAppId,
-    hasOutput
+    hasOutput,
+    shouldExplode
 }

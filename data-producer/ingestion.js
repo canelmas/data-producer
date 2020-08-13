@@ -27,6 +27,7 @@ import {
 import WebHook from "./webhook";
 import outputs from './outputs';
 import Funnel from "./funnel";
+import explode from './transformations/explode'
 
 let sendUsersOnRedis = () => {
 
@@ -265,18 +266,24 @@ let sendUser = async (user) => {
 
 }
 
-let sendEvent = async (event) => {
+let sendEvent = async (event) => {    
+    
+    let explodedEvents = undefined
+    
+    if (setup.shouldExplode()) {
+        explodedEvents = explode(event)        
+    }
 
     if (setup.hasOutput(outputs.KAFKA)) {
-        Kafka.sendEvent(event)
+        Kafka.sendEvent(explodedEvents ? explodedEvents : event)        
     }
 
     if (setup.hasOutput(outputs.WEBHOOK)) {
         WebHook.post(setup.config.webhookUrl, [event])
     }
 
-    if (setup.hasOutput(outputs.CONSOLE)) {
-        prettyPrint(event)
+    if (setup.hasOutput(outputs.CONSOLE)) {        
+        prettyPrint(explodedEvents ? explodedEvents : event)
     }
 
 }

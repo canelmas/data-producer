@@ -6,9 +6,18 @@ export let info = (msg) => {
     console.info(msg)
 }
 
-export let prettyPrint = (key, value) => {    
-    info({
-        key: key,
-        value: JSON.stringify(value)        
-    })    
+export let prettyPrint = (value, key) => {          
+    if (Array.isArray(value))   {                
+        value.forEach(event => {            
+            info({
+                key: key,
+                value: JSON.stringify(event)
+            })                
+        })
+    } else  {
+        info({
+            key: key,
+            value: JSON.stringify(value)        
+        })    
+    }    
 }

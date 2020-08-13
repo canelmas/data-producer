@@ -263,7 +263,13 @@ let sendToSingleTopicAsJson = async (topic, messageKey, messageValue) => {
 }
 
 let sendEvent = async (event) => {
-    send(config.topicOptions.events, event, ENTITY_EVENT)
+    if (Array.isArray(event)) {
+        event.forEach(e => {
+            send(config.topicOptions.events, e, ENTITY_EVENT)            
+        })
+    } else {
+        send(config.topicOptions.events, event, ENTITY_EVENT)
+    }    
 }
 
 let sendUser = async (user) => {    

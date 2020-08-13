@@ -1,0 +1,36 @@
+{
+    "steps": [
+        {
+            "name": "viewStart",
+            "attributes": {
+                "viewLabel": "word",
+                "viewClass": "number",
+                "viewId": "amount"                
+            },
+            "probability" : 0.6
+        },
+        {
+            "name": "B",
+            "attributes" : {
+                "b_key_1": "amount",
+                "b_key_2": "uuid"
+            },
+            "probability" : 0.5
+        },
+        {
+            "name": "C",            
+            "probability" : 0.9,
+            "attributes" : {
+                "c_key_1" : "boolean"
+            }
+        },
+        {
+            "name": "D",                        
+            "probability" : 0.2
+        },
+        {
+            "name": "E",
+            "probability" : 0.1
+        }
+    ]
+}
