@@ -56,16 +56,19 @@ let parseHeaders = (headersString) => {
 
 let postEvent = async (url, event) => {
 
-    try {
+    try {    
 
         if (!instance) {
             throw new Error("axios not initialized!")
         }
 
-        instance.post(url, event)            
-            .catch(err => {
-                error(`Sending event failed! ${err}`)
-            })
+        instance.post(url, event).then(resp => {    
+            if (!setup.isProd) {
+                info(resp.status)
+            }            
+        }).catch(err => {
+            error(`Sending event failed! ${err}`)            
+        })                            
 
     } catch (err) {
         error(err)

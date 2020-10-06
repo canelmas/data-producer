@@ -10,13 +10,13 @@ export let prettyPrint = (value, key) => {
     if (Array.isArray(value))   {                
         value.forEach(event => {            
             info({
-                key: key,
+                key: !key ? null : key,
                 value: JSON.stringify(event)
             })                
         })
     } else  {
         info({
-            key: key,
+            key: !key ? null : key,
             value: JSON.stringify(value)        
         })    
     }    

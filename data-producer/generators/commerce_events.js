@@ -7,7 +7,7 @@ import {
 } from 'buffer';
 
 const commerceEvents = [
-  "purchase",  
+  "purchase",
   "purchaseError",
   "viewProduct",
   "viewCategory",
@@ -20,6 +20,10 @@ const commerceEvents = [
   "removeFromCart"
 ]
 
+let getAmount = () => {
+  return _.random(1, 10000, true)
+}
+
 let generateProduct = () => {
 
   let category = faker.commerce.product()
@@ -31,7 +35,7 @@ let generateProduct = () => {
     description: util.format("A very %s %s", faker.commerce.productAdjective(), name),
     brand: util.format("%s Brand", faker.commerce.productAdjective()),
     quantity: _.random(1, 5),
-    price: Number(faker.commerce.price()),
+    price: getAmount(),
     variant: faker.commerce.color(),
     category: category,
     currency: "USD"
@@ -61,11 +65,23 @@ let getTotalValue = (products) => {
   return value
 }
 
+let getStore = () => {
+  return 'store_' + _.random(1, 50)
+}
+
+let getUserType = () => {
+  return 'userType_' + _.random(1, 10)
+}
+
+let getDistributor = () => {
+  return 'distributor_' + _.random(1, 500)
+}
+
 let generatePurchase = (success) => {
 
   let products = generateProducts(_.random(1, 10))
 
-  let totalValue = Number(getTotalValue(products))
+  let totalValue = getTotalValue(products)
 
   return {
     currency: "USD",
@@ -80,7 +96,10 @@ let generatePurchase = (success) => {
     products: products,
     success: success,
     errorCode: !success ? _.sample([100, 101, 102, 103, 104, 105]) : null,
-    errorMessage: !success ? util.format("NOK-%s", _.random(1, 10)) : null
+    errorMessage: !success ? util.format("NOK-%s", _.random(1, 10)) : null,
+    firstSuccess: _.sample([true, false]),
+    firstError: _.sample([true, false]),
+    store: getStore()
   }
 
 }
@@ -100,11 +119,11 @@ let generateEvent = () => {
   switch (event) {
 
     case "viewProduct":
-      return render(event, generateProduct())
+      return render(event, {product : generateProduct()})
 
     case "search":
       return render(event, {
-        keyword: faker.commerce.product()
+        query: faker.commerce.product()
       })
 
     case "viewCategory":
@@ -113,25 +132,25 @@ let generateEvent = () => {
       })
 
     case "purchase":
-      return render(event, generatePurchase(true))    
-    
+      return render(event, generatePurchase(true))
+
     case "purchaseError":
-      return render("purchase", generatePurchase(false))    
+      return render("purchase", generatePurchase(false))
 
     case "addToWishList":
-      return render(event, generateProduct())
+      return render(event, {product : generateProduct()})
 
     case "removeFromWishList":
-      return render(event, generateProduct())
-
-    case "startCheckout":
-      return render(event, generateCheckout())
+      return render(event, {product : generateProduct()})
 
     case "addToCart":
-      return render(event, generateProduct())
+      return render(event, {product : generateProduct(), value: getAmount(), totalCartValue : getAmount()})
 
     case "removeFromCart":
-      return render(event, generateProduct())
+      return render(event, {product : generateProduct(), value: getAmount(), totalCartValue : getAmount()})
+
+    case "startCheckout" :
+      return render(event, {value : getAmount(), currency : "USD", quantity: _.random(1, 10)})
 
     default:
       return render(event, null)
@@ -139,6 +158,20 @@ let generateEvent = () => {
 }
 
 let render = (eventName, data) => {
+
+  if (data) {
+    Object.assign(data, {
+      userType: getUserType(),
+      distributor: getDistributor()
+    })
+
+    if (['viewProduct', 'search', 'viewCategory', 'addToCart'].includes(eventName)) {
+      Object.assign(data, {
+        firstTime: _.sample([true, false])
+      })
+    }
+  }
+
   return {
     "name": eventName,
     "attrs": data

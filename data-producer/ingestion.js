@@ -278,8 +278,8 @@ let sendEvent = async (event) => {
         Kafka.sendEvent(explodedEvents ? explodedEvents : event)        
     }
 
-    if (setup.hasOutput(outputs.WEBHOOK)) {
-        WebHook.post(setup.config.webhookUrl, [event])
+    if (setup.hasOutput(outputs.WEBHOOK)) {        
+        WebHook.post(setup.config.webhookUrl, event)
     }
 
     if (setup.hasOutput(outputs.CONSOLE)) {        

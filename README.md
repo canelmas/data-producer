@@ -300,7 +300,7 @@ Default is __undefined__.
 
 ### `EVENT_DATE_RANGE`
 
-Amount of time to substract from now() while generating event times e.g. setting this value to `15D` will ensure that event time is randomly selected starting from 15 days ago.
+Amount of time to substract from now() while generating event times i.e. setting this value to `15D` will ensure that event time is randomly selected starting from 15 days ago.
 
 `M`, `D` and `Y` are supported.
 
