@@ -30,7 +30,7 @@ docker run --name=data-producer -d --restart=always \
         -e WEBHOOK_HEADERS='x-api-key:f33be30e-7695-4817-9f0c-03cb567c5732,lovely-header:value'
         -e FUNNEL_TEMPLATE="{\"steps\":[{\"name\":\"A\",\"attributes\":{\"a_key_1\":\"word\",\"a_key_2\":\"number\"},\"probability\":0.6},{\"name\":\"B\",\"attributes\":{\"b_key_1\":\"amount\",\"b_key_2\":\"uuid\"},\"probability\":0.5},{\"name\":\"C\",\"probability\":0.9,\"attributes\":{\"c_key_1\":\"boolean\"}}]}" \         
         -e EXPLODE="false"
-        canelmas/data-producer:4.6.0
+        canelmas/data-producer:4.7.0
 ```
 Images are available on [DockerHub](https://hub.docker.com/r/canelmas/data-producer).
 
@@ -205,6 +205,8 @@ Serialization format of Kafka records. Only `json` and `avro` are supported.
 
 Default is __json__.
 
+`SCHEMA_REGISTRY` is required when this paremeter is set to `avro`.
+
 ### `SCHEMA_REGISTRY`
 
 Required schema registry url if `avro` format is used.
@@ -229,7 +231,7 @@ We're basically saying producer to write `event` entity (generated event data) t
 - `events-json` topic in `json format` and
 - `events-avro` topic with subject name `events-avro-value` in `avro` format.
 
-If `avro` is used, make sure before to set `SCHEMA_REGISTRY` and to register the schema under the subject name `events-avro-value`.
+If `avro` is used, make sure to set `SCHEMA_REGISTRY` and to register the schema under the subject name `events-avro-value`.
 
 Default is __undefined__.
 
