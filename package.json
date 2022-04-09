@@ -17,7 +17,7 @@
     "kafkajs": "^1.9.3",
     "kafkajs-avro": "^1.0.4",
     "lodash": "^4.17.19",
-    "moment": "^2.22.2",
+    "moment": "^2.29.2",
     "mustache": "^3.0.0",
     "redis": "^2.8.0",
     "unescape-js": "^1.1.1",
